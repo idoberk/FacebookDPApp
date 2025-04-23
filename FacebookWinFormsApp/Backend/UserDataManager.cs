@@ -42,7 +42,6 @@ namespace FacebookDPApp.Backend
 
                 return s_Instance;
             }
-            
         }
 
         public void InitUserData(User i_LoggedInUser)
@@ -136,9 +135,9 @@ namespace FacebookDPApp.Backend
         {
             string coverPhotoURL = string.Empty;
 
-            foreach(Album photoAlbum in LoggedInUser.Albums)
+            foreach (Album photoAlbum in LoggedInUser.Albums)
             {
-                if(photoAlbum.Name == "Cover photos")
+                if (photoAlbum.Name == "Cover photos")
                 {
                     coverPhotoURL = photoAlbum.Photos[0].PictureNormalURL;
                     break;
