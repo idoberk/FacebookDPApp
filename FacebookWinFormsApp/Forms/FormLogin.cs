@@ -32,7 +32,7 @@ namespace FacebookDPApp.Forms
             buttonLogin.Location = new Point(x, y);
         }
 
-        private void buttonLogin_Click(object sender, System.EventArgs e)
+        private void buttonLogin_Click(object sender, EventArgs e)
         {
             login();
         }
