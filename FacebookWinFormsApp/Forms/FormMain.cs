@@ -18,6 +18,7 @@ namespace FacebookDPApp.Forms
         private readonly User r_LoggedInUser;
         private readonly List<MyPost> r_PostsList = new List<MyPost>();
         private readonly AlbumSlideShow r_AlbumSlideShowManager;
+        private readonly FacebookServiceFacade r_FacebookService;
         private HigherLowerGameManager m_GameManager;
         private UserDataManager m_UserDataManager;
 
@@ -25,11 +26,12 @@ namespace FacebookDPApp.Forms
         {
             InitializeComponent();
             r_LoggedInUser = i_LoggedInUser;
+            r_FacebookService = new FacebookServiceFacade(i_LoggedInUser);
 
             textBoxFillStatus.LostFocus += textBoxFillStatus_LostFocus;
 
-            initUserDataManager();
             r_AlbumSlideShowManager = new AlbumSlideShow(pictureBoxAlbums);
+            new Thread(initUserDataManager).Start();
         }
 
         private void initUserDataManager()
@@ -37,36 +39,33 @@ namespace FacebookDPApp.Forms
             m_UserDataManager = UserDataManager.Instance;
 
             m_UserDataManager.InitUserData(r_LoggedInUser);
-            fetchFriends();
+            //fetchFriends();
         }
 
         private void fetchAlbums()
         {
-            if (r_LoggedInUser.Albums != null)
+            List<Album> albumsList = r_FacebookService.GetUserAlbums();
+
+            listBoxAlbums.DisplayMember = "Name"; 
+
+            foreach (Album album in albumsList)
             {
-                listBoxAlbums.DisplayMember = "Name";
-                foreach (Album album in r_LoggedInUser.Albums)
-                {
-                    listBoxAlbums.Items.Add(album);
-                }
+                listBoxAlbums.Items.Add(album);
             }
         }
 
         private void fetchPosts()
         {
-            if (r_LoggedInUser.Posts.Count == 0)
+            List<MyPost> postsList = r_FacebookService.GetUserPosts();
+
+            if (postsList.Count == 0)
             {
                 MessageBox.Show("No Posts to load");
             }
             else
             {
-                foreach (Post post in r_LoggedInUser.Posts)
-                {
-                    if (post.Message != null)
-                    {
-                        r_PostsList.Add(new MyPost(post.Message, post.CreatedTime ?? DateTime.Now));
-                    }
-                }
+                r_PostsList.Clear();
+                r_PostsList.AddRange(postsList);
 
                 listBoxPosts.DisplayMember = "Name";
                 updatePostList();
@@ -75,18 +74,20 @@ namespace FacebookDPApp.Forms
 
         private void fetchFriends()
         {
+            //List<User> friendsList = r_FacebookService.GetUserFriends();
+
             if (m_UserDataManager.UserFriends.Count == 0)
             {
-                listBoxFriendsList.Items.Add("No friends found!");
+                listBoxFriendsList.Invoke(new Action(() => listBoxFriendsList.Items.Add("No friends found!")));
 
                 return;
             }
 
-            listBoxFriendsList.Items.Clear();
+            listBoxFriendsList.Invoke(new Action(() => listBoxFriendsList.Items.Clear()));
 
             foreach (User friend in m_UserDataManager.UserFriends)
             {
-                listBoxFriendsList.Items.Add(friend.Name);
+                listBoxFriendsList.Invoke(new Action(() => listBoxFriendsList.Items.Add(friend.Name)));
             }
         }
 
@@ -237,27 +238,30 @@ namespace FacebookDPApp.Forms
 
         private void FormMain_Load(object sender, EventArgs e)
         {
-            Thread dataLoadingThread = new Thread(loadUserDataInBackground);
-
-            dataLoadingThread.IsBackground = true;
-            dataLoadingThread.Start();
+            loadUserDataInBackground();
         }
 
         private void loadUserDataInBackground()
         {
             try
             {
-                string name = r_LoggedInUser.Name;
-                string profilePicUrl = m_UserDataManager.UserProfilePicURL;
-                string coverPicUrl = m_UserDataManager.UserCoverPicURL;
-                List<string> userInfoItems = new List<string>();
+                // string name = m_UserDataManager.UserName;
+                // string profilePicUrl = m_UserDataManager.UserProfilePicURL;
+                labelUserName.Invoke(new Action(() => labelUserName.Text = m_UserDataManager.UserName));
+                new Thread(getProfilePhoto).Start();
+                new Thread(getCoverPhoto).Start();
+                new Thread(getUserInfo).Start();
+                new Thread(fetchFriends).Start();
+                // string coverPicUrl = m_UserDataManager.UserCoverPicURL;
+                // List<string> userInfoItems = new List<string>();
 
-                foreach (string info in m_UserDataManager.UserInfo)
-                {
-                    userInfoItems.Add(info);
-                }
 
-                this.Invoke(new Action(() => updateUIWithUserData(name, profilePicUrl, coverPicUrl, userInfoItems)));
+                
+                //foreach (string info in m_UserDataManager.UserInfo)
+                //{
+                //    userInfoItems.Add(info);
+                //}
+                // this.Invoke(new Action(() => updateUIWithUserData(profilePicUrl, coverPicUrl)));
             }
             catch (Exception ex)
             {
@@ -265,21 +269,43 @@ namespace FacebookDPApp.Forms
             }
         }
 
-        private void updateUIWithUserData(
-            string i_Name,
-            string i_ProfilePicUrl,
-            string i_CoverPicUrl,
-            List<string> i_UserInfoItems)
+        private void getCoverPhoto()
         {
-            labelUserName.Text = i_Name;
-            profilePictureBox.ImageLocation = i_ProfilePicUrl;
-            coverPictureBox.ImageLocation = i_CoverPicUrl;
+            coverPictureBox.Invoke(new Action(() => coverPictureBox.Load(m_UserDataManager.UserCoverPicURL)));
+        }
 
-            listBoxUserInfo.Items.Clear();
-            foreach (string userInfo in i_UserInfoItems)
-            {
-                listBoxUserInfo.Items.Add(userInfo);
-            }
+        //private void updateUIWithUserData(
+        //    string i_ProfilePicUrl,
+        //    string i_CoverPicUrl
+        //    )
+        //{
+        //    profilePictureBox.ImageLocation = i_ProfilePicUrl;
+        //    coverPictureBox.ImageLocation = i_CoverPicUrl;
+
+        //    listBoxUserInfo.Items.Clear();
+        //    foreach(string userInfo in i_UserInfoItems)
+        //    {
+        //        listBoxUserInfo.Items.Add(userInfo);
+        //    }
+        //}
+
+        private void getUserInfo()
+        {
+            listBoxUserInfo.Invoke(
+                new Action(
+                    () =>
+                        {
+                            listBoxUserInfo.Items.Clear();
+                            foreach(string userInfo in m_UserDataManager.UserInfo)
+                            {
+                                listBoxUserInfo.Items.Add(userInfo);
+                            }
+                        }));
+        }
+
+        private void getProfilePhoto()
+        {
+            profilePictureBox.Invoke(new Action(() => profilePictureBox.Load(m_UserDataManager.UserProfilePicURL)));
         }
 
         private void handleDataLoadingError(string i_ErrorMessage)

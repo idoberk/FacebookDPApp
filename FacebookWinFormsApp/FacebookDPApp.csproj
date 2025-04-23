@@ -80,6 +80,7 @@
     <Compile Include="Backend\AlbumSlideShow.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Backend\FacebookServiceFacade.cs" />
     <Compile Include="Backend\GameOverEventArgs.cs" />
     <Compile Include="Backend\GuessResultEventArgs.cs" />
     <Compile Include="Backend\HigherLowerGameLogic.cs" />
