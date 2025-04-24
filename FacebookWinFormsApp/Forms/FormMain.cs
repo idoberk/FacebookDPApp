@@ -31,7 +31,8 @@ namespace FacebookDPApp.Forms
             textBoxFillStatus.LostFocus += textBoxFillStatus_LostFocus;
 
             r_AlbumSlideShowManager = new AlbumSlideShow(pictureBoxAlbums);
-            new Thread(initUserDataManager).Start();
+            // new Thread(initUserDataManager).Start();
+            initUserDataManager();
         }
 
         private void initUserDataManager()
@@ -238,30 +239,18 @@ namespace FacebookDPApp.Forms
 
         private void FormMain_Load(object sender, EventArgs e)
         {
-            loadUserDataInBackground();
+            updateUIWithUserData();
         }
 
-        private void loadUserDataInBackground()
+        private void updateUIWithUserData()
         {
             try
             {
-                // string name = m_UserDataManager.UserName;
-                // string profilePicUrl = m_UserDataManager.UserProfilePicURL;
                 labelUserName.Invoke(new Action(() => labelUserName.Text = m_UserDataManager.UserName));
                 new Thread(getProfilePhoto).Start();
                 new Thread(getCoverPhoto).Start();
                 new Thread(getUserInfo).Start();
                 new Thread(fetchFriends).Start();
-                // string coverPicUrl = m_UserDataManager.UserCoverPicURL;
-                // List<string> userInfoItems = new List<string>();
-
-
-                
-                //foreach (string info in m_UserDataManager.UserInfo)
-                //{
-                //    userInfoItems.Add(info);
-                //}
-                // this.Invoke(new Action(() => updateUIWithUserData(profilePicUrl, coverPicUrl)));
             }
             catch (Exception ex)
             {
@@ -271,23 +260,8 @@ namespace FacebookDPApp.Forms
 
         private void getCoverPhoto()
         {
-            coverPictureBox.Invoke(new Action(() => coverPictureBox.Load(m_UserDataManager.UserCoverPicURL)));
+            coverPictureBox.Invoke(new Action(() => coverPictureBox.LoadAsync(m_UserDataManager.UserCoverPicURL)));
         }
-
-        //private void updateUIWithUserData(
-        //    string i_ProfilePicUrl,
-        //    string i_CoverPicUrl
-        //    )
-        //{
-        //    profilePictureBox.ImageLocation = i_ProfilePicUrl;
-        //    coverPictureBox.ImageLocation = i_CoverPicUrl;
-
-        //    listBoxUserInfo.Items.Clear();
-        //    foreach(string userInfo in i_UserInfoItems)
-        //    {
-        //        listBoxUserInfo.Items.Add(userInfo);
-        //    }
-        //}
 
         private void getUserInfo()
         {
@@ -305,7 +279,7 @@ namespace FacebookDPApp.Forms
 
         private void getProfilePhoto()
         {
-            profilePictureBox.Invoke(new Action(() => profilePictureBox.Load(m_UserDataManager.UserProfilePicURL)));
+            profilePictureBox.Invoke(new Action(() => profilePictureBox.LoadAsync(m_UserDataManager.UserProfilePicURL)));
         }
 
         private void handleDataLoadingError(string i_ErrorMessage)
