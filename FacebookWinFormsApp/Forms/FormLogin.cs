@@ -41,9 +41,9 @@ namespace FacebookDPApp.Forms
         {
             try
             {
-                m_LoginResult = FacebookService.Connect(
-                    "EAAJfwfccn2sBOxL5G4JepPMQnNvGaiT5MbpZAuUzspFpE2fQh2Jz7QH736Fp6kO40gfsBQIJ8kefWlWchzykzP9jppfrG9i2glBUzxeLpJ9fwaY3UlnUDEnP0EDJPlXlm5InxLTprWnKQ5AOlijgDMiGKLhaiXSObdX1JE8GVra9ZCg7u5wTH8vcwAmfVrQOAYkFEaO5EI69McugZDZD");
-                //m_LoginResult = FacebookService.Login(k_AppID, sr_AppPermissions);
+                //m_LoginResult = FacebookService.Connect(
+                    //"EAAJfwfccn2sBOxL5G4JepPMQnNvGaiT5MbpZAuUzspFpE2fQh2Jz7QH736Fp6kO40gfsBQIJ8kefWlWchzykzP9jppfrG9i2glBUzxeLpJ9fwaY3UlnUDEnP0EDJPlXlm5InxLTprWnKQ5AOlijgDMiGKLhaiXSObdX1JE8GVra9ZCg7u5wTH8vcwAmfVrQOAYkFEaO5EI69McugZDZD");
+                m_LoginResult = FacebookService.Login(k_AppID, sr_AppPermissions);
 
                 if (!string.IsNullOrEmpty(m_LoginResult.AccessToken))
                 {

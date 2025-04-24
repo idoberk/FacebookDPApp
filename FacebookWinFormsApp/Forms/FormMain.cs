@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using FacebookDPApp.Backend;
 using FacebookWrapper;
 using FacebookWrapper.ObjectModel;
+using BasicFacebookFeatures.Backend;
 
 namespace FacebookDPApp.Forms
 {
@@ -16,10 +17,11 @@ namespace FacebookDPApp.Forms
         private const string k_TextBoxSearchFriendsPlaceHolderText = "Search Friends...";
 
         private readonly User r_LoggedInUser;
-        private readonly List<MyPost> r_PostsList = new List<MyPost>();
-        private readonly AlbumSlideShow r_AlbumSlideShowManager;
+        //private readonly List<MyPost> r_PostsList = new List<MyPost>();
+        //private readonly AlbumSlideShow r_AlbumSlideShowManager;
         private HigherLowerGameManager m_GameManager;
         private UserDataManager m_UserDataManager;
+        private FacbookServiceFacade m_facbookServiceFacade;
 
         public FormMain(User i_LoggedInUser)
         {
@@ -29,7 +31,18 @@ namespace FacebookDPApp.Forms
             textBoxFillStatus.LostFocus += textBoxFillStatus_LostFocus;
 
             initUserDataManager();
-            r_AlbumSlideShowManager = new AlbumSlideShow(pictureBoxAlbums);
+            initFacbookServiceFacade();
+
+
+            //r_AlbumSlideShowManager = new AlbumSlideShow(pictureBoxAlbums);
+            //m_facbookServiceFacade.InitSlideShow(pictureBoxAlbums);
+        }
+
+        private void initFacbookServiceFacade()
+        {
+            m_facbookServiceFacade = FacbookServiceFacade.Instance;
+            m_facbookServiceFacade.InitFacbookServiceFacade(r_LoggedInUser, pictureBoxAlbums);
+
         }
 
         private void initUserDataManager()
@@ -42,10 +55,11 @@ namespace FacebookDPApp.Forms
 
         private void fetchAlbums()
         {
-            if (r_LoggedInUser.Albums != null)
+            if (m_facbookServiceFacade.GetUserAlbums() != null)
             {
                 listBoxAlbums.DisplayMember = "Name";
-                foreach (Album album in r_LoggedInUser.Albums)
+                //foreach (Album album in r_LoggedInUser.Albums)
+                foreach (Album album in m_facbookServiceFacade.GetUserAlbums())
                 {
                     listBoxAlbums.Items.Add(album);
                 }
@@ -54,20 +68,30 @@ namespace FacebookDPApp.Forms
 
         private void fetchPosts()
         {
-            if (r_LoggedInUser.Posts.Count == 0)
+            //if (r_LoggedInUser.Posts.Count == 0)
+            //{
+            //    MessageBox.Show("No Posts to load");
+            //}
+            //else
+            //{
+            //    foreach (Post post in r_LoggedInUser.Posts)
+            //    {
+            //        if (post.Message != null)
+            //        {
+            //            r_PostsList.Add(new MyPost(post.Message, post.CreatedTime ?? DateTime.Now));
+            //        }
+            //    }
+
+            //    listBoxPosts.DisplayMember = "Name";
+            //    updatePostList();
+            //}
+
+            if (m_facbookServiceFacade.GetUserPosts().Count == 0)
             {
                 MessageBox.Show("No Posts to load");
             }
             else
             {
-                foreach (Post post in r_LoggedInUser.Posts)
-                {
-                    if (post.Message != null)
-                    {
-                        r_PostsList.Add(new MyPost(post.Message, post.CreatedTime ?? DateTime.Now));
-                    }
-                }
-
                 listBoxPosts.DisplayMember = "Name";
                 updatePostList();
             }
@@ -75,18 +99,25 @@ namespace FacebookDPApp.Forms
 
         private void fetchFriends()
         {
-            if (m_UserDataManager.UserFriends.Count == 0)
-            {
-                listBoxFriendsList.Items.Add("No friends found!");
+            //if (m_UserDataManager.UserFriends.Count == 0)
+            //{
+            //    listBoxFriendsList.Items.Add("No friends found!");
 
-                return;
-            }
+            //    return;
+            //}
+
+            //listBoxFriendsList.Items.Clear();
+
+            //foreach (User friend in m_UserDataManager.UserFriends)
+            //{
+            //    listBoxFriendsList.Items.Add(friend.Name);
+            //}
 
             listBoxFriendsList.Items.Clear();
 
-            foreach (User friend in m_UserDataManager.UserFriends)
+            foreach (string friend in m_UserDataManager.GetUserFriendsNameList())
             {
-                listBoxFriendsList.Items.Add(friend.Name);
+                listBoxFriendsList.Items.Add(friend);
             }
         }
 
@@ -94,7 +125,7 @@ namespace FacebookDPApp.Forms
         {
             listBoxPosts.Items.Clear();
 
-            foreach (MyPost myPost in r_PostsList)
+            foreach (MyPost myPost in m_facbookServiceFacade.GetUserPosts())//
             {
                 if (myPost.Message != null)
                 {
@@ -107,19 +138,22 @@ namespace FacebookDPApp.Forms
         {
             FacebookService.Logout();
             // FacebookService.LogoutWithUI();
-            r_AlbumSlideShowManager.StopSlideshow();
+            //r_AlbumSlideShowManager.StopSlideshow();
+            m_facbookServiceFacade.StopSlideShow();
             pictureBoxAlbums.Visible = false;
             this.Invoke(new Action(this.Close));
         }
 
-        private async void listBoxAlbums_SelectedIndexChanged(object sender, EventArgs e)
+        private void listBoxAlbums_SelectedIndexChanged(object sender, EventArgs e)
         {
-            r_AlbumSlideShowManager.StopSlideshow();
+            //r_AlbumSlideShowManager.StopSlideshow();
+            m_facbookServiceFacade.StopSlideShow();
 
             if (listBoxAlbums.SelectedItem is Album selectedAlbum)
             {
-                List<Photo> photos = await fetchPhotosFromSelectedAlbum(selectedAlbum);
-                r_AlbumSlideShowManager.StartSlideshow(photos);
+                //List<Photo> photos = await fetchPhotosFromSelectedAlbum(selectedAlbum);
+                //r_AlbumSlideShowManager.StartSlideshow(photos);
+                m_facbookServiceFacade.StartSlidesShow(selectedAlbum);
             }
         }
 
@@ -143,25 +177,26 @@ namespace FacebookDPApp.Forms
                 return;
             }
 
-            r_PostsList.Insert(0, new MyPost(newPostText, DateTime.Now));
+            m_facbookServiceFacade.AddPost(newPostText);
+            //r_PostsList.Insert(0, new MyPost(newPostText, DateTime.Now));
             updatePostList();
             resetTextBoxFillStatusStyle();
         }
 
-        private async Task<List<Photo>> fetchPhotosFromSelectedAlbum(Album i_SelectedAlbum)
-        {
-            List<Photo> photosUrl = new List<Photo>();
+        //private async Task<List<Photo>> fetchPhotosFromSelectedAlbum(Album i_SelectedAlbum)
+        //{
+        //    List<Photo> photosUrl = new List<Photo>();
 
-            if (i_SelectedAlbum != null)
-            {
-                foreach (Photo photo in i_SelectedAlbum.Photos)
-                {
-                    photosUrl.Add(photo);
-                }
-            }
+        //    if (i_SelectedAlbum != null)
+        //    {
+        //        foreach (Photo photo in i_SelectedAlbum.Photos)
+        //        {
+        //            photosUrl.Add(photo);
+        //        }
+        //    }
 
-            return photosUrl;
-        }
+        //    return photosUrl;
+        //}
 
         private void resetTextBoxFillStatusStyle()
         {
@@ -171,7 +206,8 @@ namespace FacebookDPApp.Forms
 
         private void comboBoxSortingOptions_SelectedIndexChanged(object sender, EventArgs e)
         {
-            r_PostsList.Sort(new PostSorter(comboBoxSortingOptions.SelectedIndex));
+            //r_PostsList.Sort(new PostSorter(comboBoxSortingOptions.SelectedIndex));
+            m_facbookServiceFacade.Sort(comboBoxSortingOptions.SelectedIndex);
             updatePostList();
         }
 
@@ -232,7 +268,7 @@ namespace FacebookDPApp.Forms
 
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
-            m_GameManager?.Cleanup();
+            m_GameManager?.Cleanup();//????? Is it supose to be from yhis event?
         }
 
         private void FormMain_Load(object sender, EventArgs e)

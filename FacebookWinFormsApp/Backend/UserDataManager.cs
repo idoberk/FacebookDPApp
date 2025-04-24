@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using FacebookWrapper.ObjectModel;
 
 namespace FacebookDPApp.Backend
@@ -89,7 +91,7 @@ namespace FacebookDPApp.Backend
         {
             try
             {
-                UserLocation = LoggedInUser.Location.Name;
+                UserLocation = LoggedInUser.Location?.Name ?? string.Empty;
             }
             catch (Exception)
             {
@@ -137,7 +139,7 @@ namespace FacebookDPApp.Backend
 
             foreach (Album photoAlbum in LoggedInUser.Albums)
             {
-                if (photoAlbum.Name == "Cover photos")
+                if (photoAlbum.Name == "Cover photos" ||photoAlbum.Name == "תמונות נושא")
                 {
                     coverPhotoURL = photoAlbum.Photos[0].PictureNormalURL;
                     break;
@@ -167,6 +169,20 @@ namespace FacebookDPApp.Backend
             {
                 UserFriends = null;
             }
+        }
+
+        public List<string> GetUserFriendsNameList()
+        {
+            List<string> userFriendsNameList;
+            if (UserFriends.Count == 0)
+            {
+                userFriendsNameList = new List<string> { "No friends found!" };
+            }
+            else
+            {
+                userFriendsNameList = UserFriends.Select(friend => friend.Name).ToList();
+            }
+            return userFriendsNameList;
         }
 
         private void loadUserData()
