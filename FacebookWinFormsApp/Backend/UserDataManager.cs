@@ -1,5 +1,7 @@
-﻿using System;
-using FacebookWrapper.ObjectModel;
+﻿using FacebookWrapper.ObjectModel;
+using System.Collections.Generic;
+using System;
+using System.Linq;
 
 namespace FacebookDPApp.Backend
 {
@@ -9,16 +11,25 @@ namespace FacebookDPApp.Backend
         private static readonly object sr_LockObject = new object();
 
         public User LoggedInUser { get; private set; }
+
         public FacebookObjectCollection<string> UserInfo { get; private set; }
+
         public FacebookObjectCollection<User> UserFriends { get; private set; }
+
         public string UserName { get; private set; }
+
         public string UserLocation { get; private set; }
+
         public string UserBirthday { get; private set; }
+
         public string UserGender { get; private set; }
+
         public string UserProfilePicURL { get; private set; }
+
         public string UserCoverPicURL { get; private set; }
+
         public int UserAge { get; private set; }
-        
+
         private UserDataManager()
         {
             UserInfo = new FacebookObjectCollection<string>();
@@ -89,7 +100,7 @@ namespace FacebookDPApp.Backend
         {
             try
             {
-                UserLocation = LoggedInUser.Location.Name;
+                UserLocation = LoggedInUser.Location?.Name ?? string.Empty;
             }
             catch (Exception)
             {
@@ -137,7 +148,7 @@ namespace FacebookDPApp.Backend
 
             foreach (Album photoAlbum in LoggedInUser.Albums)
             {
-                if (photoAlbum.Name == "Cover photos")
+                if (photoAlbum.Name == "Cover photos" || photoAlbum.Name == "תמונות נושא")
                 {
                     coverPhotoURL = photoAlbum.Photos[0].PictureNormalURL;
                     break;
@@ -169,15 +180,36 @@ namespace FacebookDPApp.Backend
             }
         }
 
+        public FacebookObjectCollection<User> GetUserFriendsList()
+        {
+            return UserFriends;
+        }
+
+        public List<string> GetUserFriendsNameList()
+        {
+            List<string> userFriendsNameList;
+
+            if (UserFriends.Count == 0)
+            {
+                userFriendsNameList = new List<string> { "No friends found!" };
+            }
+            else
+            {
+                userFriendsNameList = UserFriends.Select(friend => friend.Name).ToList();
+            }
+
+            return userFriendsNameList;
+        }
+
         private void loadUserData()
         {
             UserInfo = new FacebookObjectCollection<string>
-            {
-                $"Lives in: {UserLocation}",
-                $"Birthday: {UserBirthday}",
-                $"Age: {UserAge}",
-                $"Gender: {UserGender}"
-            };
+                           {
+                               $"Lives in: {UserLocation}",
+                               $"Birthday: {UserBirthday}",
+                               $"Age: {UserAge}",
+                               $"Gender: {UserGender}"
+                           };
         }
     }
 }

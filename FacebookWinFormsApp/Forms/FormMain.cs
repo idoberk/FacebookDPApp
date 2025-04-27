@@ -17,25 +17,21 @@ namespace FacebookDPApp.Forms
         private const string k_TextBoxSearchFriendsPlaceHolderText = "Search Friends...";
 
         private readonly User r_LoggedInUser;
-        private readonly List<MyPost> r_PostsList = new List<MyPost>();
-        private readonly AlbumSlideShow r_AlbumSlideShowManager;
-        private readonly FacebookServiceFacade r_FacebookService;
         private HigherLowerGameManager m_GameManager;
         private UserDataManager m_UserDataManager;
-
+        private FacebookServiceFacade m_facebookServiceFacade;
         private SortingControl<MyPost> m_PostSortingControl;
 
         public FormMain(User i_LoggedInUser)
         {
             InitializeComponent();
             r_LoggedInUser = i_LoggedInUser;
-            r_FacebookService = new FacebookServiceFacade(i_LoggedInUser);
 
             textBoxFillStatus.LostFocus += textBoxFillStatus_LostFocus;
 
-            r_AlbumSlideShowManager = new AlbumSlideShow(pictureBoxAlbums);
-            initSortingControls();
             initUserDataManager();
+            initFacebookServiceFacade();
+            initSortingControls();
         }
 
         private void initUserDataManager()
@@ -46,6 +42,15 @@ namespace FacebookDPApp.Forms
             // fetchFriends();
         }
 
+        private void initFacebookServiceFacade()
+        {
+            m_facebookServiceFacade = FacebookServiceFacade.Instance;
+            m_facebookServiceFacade.InitFacebookServiceFacade(r_LoggedInUser, pictureBoxAlbums);
+
+            // fetchPosts();
+            // fetchAlbums();
+        }
+
         private void initSortingControls()
         {
             m_PostSortingControl =
@@ -53,45 +58,45 @@ namespace FacebookDPApp.Forms
 
             m_PostSortingControl.SortingChanged += PostSortingControl_SortingChanged;
 
-            m_PostSortingControl.SelectSortOption(0);
+            // m_PostSortingControl.SelectSortOption(0);
             tabPageHome.Controls.Add(m_PostSortingControl);
         }
 
         private void PostSortingControl_SortingChanged(object sender, SortComponent<MyPost> sorter)
         {
-            if (r_PostsList.Count > 0 && sorter != null)
+            if (sorter != null)
             {
-                r_PostsList.Sort(sorter);
+                m_facebookServiceFacade.Sort(sorter);
                 updatePostList();
             }
+            //if(r_PostsList.Count > 0 && sorter != null)
+            //{
+            //    r_PostsList.Sort(sorter);
+            //    updatePostList();
+            //}
         }
 
         private void fetchAlbums()
         {
-            List<Album> albumsList = r_FacebookService.GetUserAlbums();
-
-            listBoxAlbums.DisplayMember = "Name"; 
-
-            foreach (Album album in albumsList)
+            if(m_facebookServiceFacade.GetUserAlbums() != null)
             {
-                listBoxAlbums.Items.Add(album);
+                listBoxAlbums.Invoke(new Action(() => listBoxAlbums.DisplayMember = "Name"));
+
+                foreach(Album album in m_facebookServiceFacade.GetUserAlbums())
+                {
+                    listBoxAlbums.Invoke(new Action(() => listBoxAlbums.Items.Add(album)));
+                }
             }
         }
 
         private void fetchPosts()
         {
-            List<MyPost> postsList = r_FacebookService.GetUserPosts();
-
-            if (postsList.Count == 0)
+            if (m_facebookServiceFacade.GetUserPosts().Count == 0)
             {
                 MessageBox.Show("No Posts to load");
-            }
-            else
+            } else
             {
-                r_PostsList.Clear();
-                r_PostsList.AddRange(postsList);
-
-                listBoxPosts.DisplayMember = "Name";
+                // listBoxPosts.DisplayMember = "Name";
                 updatePostList();
             }
         }
@@ -100,16 +105,11 @@ namespace FacebookDPApp.Forms
         {
             // List<User> friendsList = r_FacebookService.GetUserFriends();
 
-            if (m_UserDataManager.UserFriends.Count == 0)
-            {
-                listBoxFriendsList.Invoke(new Action(() => listBoxFriendsList.Items.Add("No friends found!")));
-
-                return;
-            }
-
             listBoxFriendsList.Invoke(new Action(() => listBoxFriendsList.Items.Clear()));
 
-            foreach (User friend in m_UserDataManager.UserFriends)
+            FacebookObjectCollection<User> friendsList = m_UserDataManager.GetUserFriendsList();
+
+            foreach(User friend in friendsList)
             {
                 listBoxFriendsList.Invoke(new Action(() => listBoxFriendsList.Items.Add(friend.Name)));
             }
@@ -117,13 +117,15 @@ namespace FacebookDPApp.Forms
 
         private void updatePostList()
         {
-            listBoxPosts.Items.Clear();
+            listBoxPosts.Invoke(new Action(() => listBoxPosts.Items.Clear()));
 
-            foreach (MyPost myPost in r_PostsList)
+            List<MyPost> postsList = m_facebookServiceFacade.GetUserPosts();
+
+            foreach (MyPost myPost in postsList)
             {
                 if (myPost.Message != null)
                 {
-                    listBoxPosts.Items.Add($"{myPost.Message} | Likes: {myPost.LikesCount} | Posted: {myPost.CreatedTime}");
+                    listBoxPosts.Invoke(new Action(() => listBoxPosts.Items.Add($"{myPost.Message} | Likes: {myPost.LikesCount} | Posted: {myPost.CreatedTime}")));
                 }
             }
         }
@@ -132,20 +134,20 @@ namespace FacebookDPApp.Forms
         {
             FacebookService.Logout();
             // FacebookService.LogoutWithUI();
-            r_AlbumSlideShowManager.StopSlideshow();
+            m_facebookServiceFacade.StopSlideShow();
             pictureBoxAlbums.Visible = false;
             this.Invoke(new Action(this.Close));
         }
 
         private async void listBoxAlbums_SelectedIndexChanged(object sender, EventArgs e)
         {
-            r_AlbumSlideShowManager.StopSlideshow();
+            m_facebookServiceFacade.StopSlideShow();
 
-            if (listBoxAlbums.SelectedItem is Album selectedAlbum)
+            if(listBoxAlbums.SelectedItem is Album selectedAlbum)
             {
-                List<Photo> photos = await fetchPhotosFromSelectedAlbum(selectedAlbum);
-
-                r_AlbumSlideShowManager.StartSlideshow(photos);
+                //List<Photo> photos = await fetchPhotosFromSelectedAlbum(selectedAlbum);
+                //r_AlbumSlideShowManager.StartSlideshow(photos);
+                m_facebookServiceFacade.StartSlidesShow(selectedAlbum);
             }
         }
 
@@ -169,7 +171,7 @@ namespace FacebookDPApp.Forms
                 return;
             }
 
-            r_PostsList.Insert(0, new MyPost(newPostText, DateTime.Now));
+            m_facebookServiceFacade.AddPost(newPostText);
             updatePostList();
             resetTextBoxFillStatusStyle();
         }
@@ -240,7 +242,7 @@ namespace FacebookDPApp.Forms
 
             }
 
-            r_PostsList.Sort(sorter);
+            m_facebookServiceFacade.Sort(sorter);
             // r_PostsList.Sort(new PostSorter(comboBoxSortingOptions.SelectedIndex));
             updatePostList();
         }
@@ -319,6 +321,8 @@ namespace FacebookDPApp.Forms
                 new Thread(getCoverPhoto).Start();
                 new Thread(getUserInfo).Start();
                 new Thread(fetchFriends).Start();
+                new Thread(fetchPosts).Start();
+                new Thread(fetchAlbums).Start();
             }
             catch (Exception ex)
             {

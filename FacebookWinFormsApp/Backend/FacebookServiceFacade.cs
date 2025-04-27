@@ -1,88 +1,143 @@
-﻿using System;
+﻿using FacebookWrapper.ObjectModel;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using FacebookWrapper.ObjectModel;
 
 namespace FacebookDPApp.Backend
 {
-    public class FacebookServiceFacade
+    public sealed class FacebookServiceFacade
     {
-        private readonly User r_LoggedInUser;
-        private List<MyPost> m_PostsList;
+        private static FacebookServiceFacade s_Instance;
+        private static readonly object sr_LockObject = new object();
 
-        public FacebookServiceFacade(User i_LoggedInUser)
+        public User LoggedInUserFacade { get; private set; }
+
+        private readonly List<MyPost> r_PostsList = new List<MyPost>();
+        private AlbumSlideShow m_AlbumSlideShowManager; // Ido- its not readOnly Now, not sure it is suppose to be here
+
+        public static FacebookServiceFacade Instance
         {
-            r_LoggedInUser = i_LoggedInUser;
-            m_PostsList = new List<MyPost>();
+            get
+            {
+                if (s_Instance == null)
+                {
+                    lock (sr_LockObject)
+                    {
+                        if (s_Instance == null)
+                        {
+                            s_Instance = new FacebookServiceFacade();
+                        }
+                    }
+                }
+
+                return s_Instance;
+            }
         }
 
-        public List<Album> GetUserAlbums()
+        public void InitFacebookServiceFacade(
+            User i_LoggedInUser,
+            PictureBox i_PictureBoxAlbums) // not good to send in pictureBox
         {
-            List<Album> albumsList = new List<Album>();
+            if (i_LoggedInUser == null)
+            {
+                throw new ArgumentException(nameof(i_LoggedInUser), "User cannot be null");
+            }
 
             try
             {
-                if (r_LoggedInUser.Albums != null)
-                {
-                    foreach (Album album in r_LoggedInUser.Albums)
-                    {
-                        albumsList.Add(album);
-                    }
-                }
+                LoggedInUserFacade = i_LoggedInUser;
+                setUserPostsList();
+                setUserAlbumsList(i_PictureBoxAlbums);
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error fetching albums: {ex.Message}");
+                throw new Exception("Failed to initialize user facade", ex);
             }
+        }
 
-            return albumsList;
+        private void setUserAlbumsList(PictureBox i_PictureBoxAlbums)
+        {
+            m_AlbumSlideShowManager = new AlbumSlideShow(i_PictureBoxAlbums);
+        }
+
+        private void setUserPostsList()
+        {
+            if (LoggedInUserFacade.Posts.Count == 0)
+            {
+                
+            }
+            else
+            {
+                foreach (Post post in LoggedInUserFacade.Posts)
+                {
+                    if (post.Message != null)
+                    {
+                        r_PostsList.Add(new MyPost(post.Message, post.CreatedTime ?? DateTime.Now));
+                    }
+                }
+            }
         }
 
         public List<MyPost> GetUserPosts()
         {
-            m_PostsList.Clear();
-
-            try
-            {
-                if (r_LoggedInUser.Posts != null && r_LoggedInUser.Posts.Count > 0)
-                {
-                    foreach (Post post in r_LoggedInUser.Posts)
-                    {
-                        if (post.Message != null)
-                        {
-                            m_PostsList.Add(new MyPost(post.Message, post.CreatedTime ?? DateTime.Now));
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error fetching posts: {ex.Message}");
-            }
-
-            return m_PostsList;
+            return r_PostsList;
         }
 
-        //public List<User> GetUserFriends()
+        public AlbumSlideShow GetAlbumSlideShow()
+        {
+            return m_AlbumSlideShowManager;
+        }
+
+        public FacebookObjectCollection<Album> GetUserAlbums()
+        {
+            return LoggedInUserFacade.Albums;
+        }
+
+        public void StopSlideShow()
+        {
+            m_AlbumSlideShowManager.StopSlideshow();
+        }
+
+        public void AddPost(string i_PostText)
+        {
+            r_PostsList.Insert(0, new MyPost(i_PostText, DateTime.Now));
+        }
+
+        //public void Sort(int i_SortingChoice)
         //{
-        //    List<User> friendsList = new List<User>();
-
-        //    try
-        //    {
-        //        if (r_LoggedInUser.Friends != null && r_LoggedInUser.Friends.Count > 0)
-        //        {
-        //            foreach (User friend in r_LoggedInUser.Friends)
-        //            {
-        //                friendsList.Add(friend);
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show($"Error fetching friends: {ex.Message}");
-        //    }
-
-        //    return friendsList;
+        //    r_PostsList.Sort(new PostSorter(i_SortingChoice));
         //}
+
+        public void Sort(SortComponent<MyPost> i_Sorter)
+        {
+            r_PostsList.Sort(i_Sorter);
+        }
+
+        //public void StartSlidesShow(List<Photo> photos)
+        //{
+        //    m_AlbumSlideShowManager.StartSlideshow(photos);
+        //}
+
+        public async void StartSlidesShow(Album i_SelectedAlbum)
+        {
+            List<Photo> photos = await fetchPhotosFromSelectedAlbum(i_SelectedAlbum);
+            m_AlbumSlideShowManager.StartSlideshow(photos);
+        }
+
+        private async Task<List<Photo>> fetchPhotosFromSelectedAlbum(Album i_SelectedAlbum)
+        {
+            List<Photo> photosUrl = new List<Photo>();
+
+            if (i_SelectedAlbum != null)
+            {
+                foreach (Photo photo in i_SelectedAlbum.Photos)
+                {
+                    photosUrl.Add(photo);
+                }
+            }
+
+            return photosUrl;
+        }
     }
 }
