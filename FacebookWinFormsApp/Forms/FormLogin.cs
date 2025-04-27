@@ -16,7 +16,6 @@ namespace FacebookDPApp.Forms
         private LoginResult m_LoginResult;
         private User m_LoggedInUser;
 
-
         public FormLogin()
         {
             InitializeComponent();

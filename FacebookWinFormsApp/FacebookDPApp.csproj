@@ -80,6 +80,7 @@
     <Compile Include="Backend\AlbumSlideShow.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Backend\CompositeSorter.cs" />
     <Compile Include="Backend\FacebookServiceFacade.cs" />
     <Compile Include="Backend\GameOverEventArgs.cs" />
     <Compile Include="Backend\GuessResultEventArgs.cs" />
@@ -87,6 +88,8 @@
     <Compile Include="Backend\HigherLowerGameManager.cs" />
     <Compile Include="Backend\MockPage.cs" />
     <Compile Include="Backend\PageSelectedEventArgs.cs" />
+    <Compile Include="Backend\PropertySorter.cs" />
+    <Compile Include="Backend\SortComponent.cs" />
     <Compile Include="Backend\TimerEventArgs.cs" />
     <Compile Include="Backend\UserDataManager.cs" />
     <Compile Include="CustomControls\CircularPictureBox.cs">

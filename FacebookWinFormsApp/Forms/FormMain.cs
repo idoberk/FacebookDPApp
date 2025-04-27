@@ -31,7 +31,7 @@ namespace FacebookDPApp.Forms
             textBoxFillStatus.LostFocus += textBoxFillStatus_LostFocus;
 
             r_AlbumSlideShowManager = new AlbumSlideShow(pictureBoxAlbums);
-            // new Thread(initUserDataManager).Start();
+
             initUserDataManager();
         }
 
@@ -40,7 +40,7 @@ namespace FacebookDPApp.Forms
             m_UserDataManager = UserDataManager.Instance;
 
             m_UserDataManager.InitUserData(r_LoggedInUser);
-            //fetchFriends();
+            // fetchFriends();
         }
 
         private void fetchAlbums()
@@ -75,7 +75,7 @@ namespace FacebookDPApp.Forms
 
         private void fetchFriends()
         {
-            //List<User> friendsList = r_FacebookService.GetUserFriends();
+            // List<User> friendsList = r_FacebookService.GetUserFriends();
 
             if (m_UserDataManager.UserFriends.Count == 0)
             {
@@ -121,6 +121,7 @@ namespace FacebookDPApp.Forms
             if (listBoxAlbums.SelectedItem is Album selectedAlbum)
             {
                 List<Photo> photos = await fetchPhotosFromSelectedAlbum(selectedAlbum);
+
                 r_AlbumSlideShowManager.StartSlideshow(photos);
             }
         }
@@ -173,7 +174,51 @@ namespace FacebookDPApp.Forms
 
         private void comboBoxSortingOptions_SelectedIndexChanged(object sender, EventArgs e)
         {
-            r_PostsList.Sort(new PostSorter(comboBoxSortingOptions.SelectedIndex));
+            SortComponent<MyPost> sorter;
+
+            switch (comboBoxSortingOptions.SelectedIndex)
+            {
+                case 0:
+                    sorter = new PropertySorter<MyPost, string>(post => post.Message, i_Ascending: true);
+                    break;
+
+                case 1:
+                    sorter = new PropertySorter<MyPost, string>(post => post.Message, i_Ascending: false);
+                    break;
+
+                case 2:
+                    sorter = new PropertySorter<MyPost, DateTime>(post => post.CreatedTime, i_Ascending: true);
+                    break;
+
+                case 3:
+                    sorter = new PropertySorter<MyPost, DateTime>(post => post.CreatedTime, i_Ascending: false);
+                    break;
+
+                case 4:
+                    sorter = new PropertySorter<MyPost, int>(post => post.LikesCount, i_Ascending: true);
+                    break;
+
+                case 5:
+                    sorter = new PropertySorter<MyPost, int>(post => post.LikesCount, i_Ascending: false);
+                    break;
+
+                case 6:
+                    CompositeSorter<MyPost> compositeSorter = new CompositeSorter<MyPost>();
+
+                    compositeSorter.Add(new PropertySorter<MyPost, DateTime>(post => post.CreatedTime, false));
+                    compositeSorter.Add(new PropertySorter<MyPost, int>(post => post.LikesCount, i_Ascending: false));
+
+                    sorter = compositeSorter;
+                    break;
+
+                default:
+                    sorter = new PropertySorter<MyPost, string>(post => post.Message, true);
+                    break;
+
+            }
+
+            r_PostsList.Sort(sorter);
+            // r_PostsList.Sort(new PostSorter(comboBoxSortingOptions.SelectedIndex));
             updatePostList();
         }
 
