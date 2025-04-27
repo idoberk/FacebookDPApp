@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FacebookDPApp.Backend;
+using FacebookDPApp.CustomControls;
 using FacebookWrapper;
 using FacebookWrapper.ObjectModel;
 
@@ -22,6 +23,8 @@ namespace FacebookDPApp.Forms
         private HigherLowerGameManager m_GameManager;
         private UserDataManager m_UserDataManager;
 
+        private SortingControl<MyPost> m_PostSortingControl;
+
         public FormMain(User i_LoggedInUser)
         {
             InitializeComponent();
@@ -31,7 +34,7 @@ namespace FacebookDPApp.Forms
             textBoxFillStatus.LostFocus += textBoxFillStatus_LostFocus;
 
             r_AlbumSlideShowManager = new AlbumSlideShow(pictureBoxAlbums);
-
+            initSortingControls();
             initUserDataManager();
         }
 
@@ -41,6 +44,26 @@ namespace FacebookDPApp.Forms
 
             m_UserDataManager.InitUserData(r_LoggedInUser);
             // fetchFriends();
+        }
+
+        private void initSortingControls()
+        {
+            m_PostSortingControl =
+                SortingControlFactory.CreatePostSortingControl(new Point(654, 99), new Size(180, 50));
+
+            m_PostSortingControl.SortingChanged += PostSortingControl_SortingChanged;
+
+            m_PostSortingControl.SelectSortOption(0);
+            tabPageHome.Controls.Add(m_PostSortingControl);
+        }
+
+        private void PostSortingControl_SortingChanged(object sender, SortComponent<MyPost> sorter)
+        {
+            if (r_PostsList.Count > 0 && sorter != null)
+            {
+                r_PostsList.Sort(sorter);
+                updatePostList();
+            }
         }
 
         private void fetchAlbums()
@@ -100,7 +123,7 @@ namespace FacebookDPApp.Forms
             {
                 if (myPost.Message != null)
                 {
-                    listBoxPosts.Items.Add(myPost.Message);
+                    listBoxPosts.Items.Add($"{myPost.Message} | Likes: {myPost.LikesCount} | Posted: {myPost.CreatedTime}");
                 }
             }
         }

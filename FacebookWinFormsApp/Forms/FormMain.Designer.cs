@@ -190,7 +190,7 @@ namespace FacebookDPApp.Forms
             this.labelSortPosts.Font = new System.Drawing.Font("Arial", 12F);
             this.labelSortPosts.ForeColor = System.Drawing.SystemColors.ControlText;
             this.labelSortPosts.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.labelSortPosts.Location = new System.Drawing.Point(654, 99);
+            this.labelSortPosts.Location = new System.Drawing.Point(436, 45);
             this.labelSortPosts.Name = "labelSortPosts";
             this.labelSortPosts.Size = new System.Drawing.Size(63, 18);
             this.labelSortPosts.TabIndex = 71;
@@ -211,7 +211,7 @@ namespace FacebookDPApp.Forms
             "Creation Time (Descending)",
             "Likes Amount (Ascending)",
             "Likes Amount (Descending)"});
-            this.comboBoxSortingOptions.Location = new System.Drawing.Point(654, 120);
+            this.comboBoxSortingOptions.Location = new System.Drawing.Point(436, 66);
             this.comboBoxSortingOptions.Name = "comboBoxSortingOptions";
             this.comboBoxSortingOptions.Size = new System.Drawing.Size(180, 23);
             this.comboBoxSortingOptions.TabIndex = 70;

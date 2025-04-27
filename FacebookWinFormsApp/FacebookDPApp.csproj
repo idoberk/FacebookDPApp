@@ -104,6 +104,16 @@
     <Compile Include="CustomControls\RoundedLabel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CustomControls\BaseSortingControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomControls\BaseSortingControl.Designer.cs">
+      <DependentUpon>BaseSortingControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CustomControls\SortingControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CustomControls\SortingControlFactory.cs" />
     <Compile Include="Forms\FormLogin.cs">
       <SubType>Form</SubType>
     </Compile>
