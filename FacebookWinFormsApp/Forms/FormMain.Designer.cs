@@ -37,11 +37,8 @@ namespace FacebookDPApp.Forms
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.tabControl = new FacebookDPApp.CustomControls.CustomTabControl();
             this.tabPageHome = new System.Windows.Forms.TabPage();
-            this.buttonFetchAlbums = new FacebookDPApp.CustomControls.RoundedButton();
-            this.buttonFetchPosts = new FacebookDPApp.CustomControls.RoundedButton();
+            this.albumBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.listBoxPosts = new System.Windows.Forms.ListBox();
-            this.labelSortPosts = new System.Windows.Forms.Label();
-            this.comboBoxSortingOptions = new System.Windows.Forms.ComboBox();
             this.buttonSubmitPost = new FacebookDPApp.CustomControls.RoundedButton();
             this.pictureBoxAlbums = new System.Windows.Forms.PictureBox();
             this.textBoxFillStatus = new System.Windows.Forms.TextBox();
@@ -72,6 +69,7 @@ namespace FacebookDPApp.Forms
             this.labelScore = new System.Windows.Forms.Label();
             this.tabControl.SuspendLayout();
             this.tabPageHome.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.albumBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxAlbums)).BeginInit();
             this.tabPageProfile.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.profilePictureBox)).BeginInit();
@@ -113,12 +111,9 @@ namespace FacebookDPApp.Forms
             // 
             // tabPageHome
             // 
+            this.tabPageHome.AutoScroll = true;
             this.tabPageHome.BackColor = System.Drawing.Color.Transparent;
-            this.tabPageHome.Controls.Add(this.buttonFetchAlbums);
-            this.tabPageHome.Controls.Add(this.buttonFetchPosts);
             this.tabPageHome.Controls.Add(this.listBoxPosts);
-            this.tabPageHome.Controls.Add(this.labelSortPosts);
-            this.tabPageHome.Controls.Add(this.comboBoxSortingOptions);
             this.tabPageHome.Controls.Add(this.buttonSubmitPost);
             this.tabPageHome.Controls.Add(this.pictureBoxAlbums);
             this.tabPageHome.Controls.Add(this.textBoxFillStatus);
@@ -133,89 +128,20 @@ namespace FacebookDPApp.Forms
             this.tabPageHome.UseVisualStyleBackColor = true;
             this.tabPageHome.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tabPageHome_MouseDown);
             // 
-            // buttonFetchAlbums
+            // albumBindingSource
             // 
-            this.buttonFetchAlbums.BackColor = System.Drawing.Color.DodgerBlue;
-            this.buttonFetchAlbums.BackgroundColor = System.Drawing.Color.DodgerBlue;
-            this.buttonFetchAlbums.BorderColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.buttonFetchAlbums.BorderRadius = 10;
-            this.buttonFetchAlbums.BorderSize = 3;
-            this.buttonFetchAlbums.FlatAppearance.BorderSize = 0;
-            this.buttonFetchAlbums.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonFetchAlbums.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold);
-            this.buttonFetchAlbums.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.buttonFetchAlbums.Location = new System.Drawing.Point(8, 254);
-            this.buttonFetchAlbums.Name = "buttonFetchAlbums";
-            this.buttonFetchAlbums.Size = new System.Drawing.Size(145, 30);
-            this.buttonFetchAlbums.TabIndex = 73;
-            this.buttonFetchAlbums.Text = "Fetch Albums";
-            this.buttonFetchAlbums.TextColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.buttonFetchAlbums.UseVisualStyleBackColor = false;
-            this.buttonFetchAlbums.Click += new System.EventHandler(this.buttonFetchAlbums_Click);
-            // 
-            // buttonFetchPosts
-            // 
-            this.buttonFetchPosts.BackColor = System.Drawing.Color.DodgerBlue;
-            this.buttonFetchPosts.BackgroundColor = System.Drawing.Color.DodgerBlue;
-            this.buttonFetchPosts.BorderColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.buttonFetchPosts.BorderRadius = 10;
-            this.buttonFetchPosts.BorderSize = 3;
-            this.buttonFetchPosts.FlatAppearance.BorderSize = 0;
-            this.buttonFetchPosts.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.buttonFetchPosts.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonFetchPosts.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.buttonFetchPosts.Location = new System.Drawing.Point(8, 64);
-            this.buttonFetchPosts.Name = "buttonFetchPosts";
-            this.buttonFetchPosts.Size = new System.Drawing.Size(145, 30);
-            this.buttonFetchPosts.TabIndex = 72;
-            this.buttonFetchPosts.Text = "Fetch Posts";
-            this.buttonFetchPosts.TextColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.buttonFetchPosts.UseVisualStyleBackColor = false;
-            this.buttonFetchPosts.Click += new System.EventHandler(this.buttonFetchPosts_Click);
+            this.albumBindingSource.DataSource = typeof(FacebookWrapper.ObjectModel.Album);
             // 
             // listBoxPosts
             // 
             this.listBoxPosts.Font = new System.Drawing.Font("Arial", 9F);
             this.listBoxPosts.FormattingEnabled = true;
             this.listBoxPosts.ItemHeight = 15;
-            this.listBoxPosts.Location = new System.Drawing.Point(8, 99);
+            this.listBoxPosts.Location = new System.Drawing.Point(8, 54);
             this.listBoxPosts.Name = "listBoxPosts";
-            this.listBoxPosts.Size = new System.Drawing.Size(640, 124);
+            this.listBoxPosts.Size = new System.Drawing.Size(640, 214);
             this.listBoxPosts.TabIndex = 59;
             this.listBoxPosts.Leave += new System.EventHandler(this.listBox_Leave);
-            // 
-            // labelSortPosts
-            // 
-            this.labelSortPosts.AutoSize = true;
-            this.labelSortPosts.Font = new System.Drawing.Font("Arial", 12F);
-            this.labelSortPosts.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.labelSortPosts.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.labelSortPosts.Location = new System.Drawing.Point(436, 45);
-            this.labelSortPosts.Name = "labelSortPosts";
-            this.labelSortPosts.Size = new System.Drawing.Size(63, 18);
-            this.labelSortPosts.TabIndex = 71;
-            this.labelSortPosts.Text = "Sort By:";
-            // 
-            // comboBoxSortingOptions
-            // 
-            this.comboBoxSortingOptions.BackColor = System.Drawing.SystemColors.HighlightText;
-            this.comboBoxSortingOptions.Cursor = System.Windows.Forms.Cursors.Default;
-            this.comboBoxSortingOptions.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxSortingOptions.Font = new System.Drawing.Font("Arial", 9F);
-            this.comboBoxSortingOptions.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.comboBoxSortingOptions.FormattingEnabled = true;
-            this.comboBoxSortingOptions.Items.AddRange(new object[] {
-            "Alphabet (Ascending)",
-            "Alphabet (Descending)",
-            "Creation Time (Ascending)",
-            "Creation Time (Descending)",
-            "Likes Amount (Ascending)",
-            "Likes Amount (Descending)"});
-            this.comboBoxSortingOptions.Location = new System.Drawing.Point(436, 66);
-            this.comboBoxSortingOptions.Name = "comboBoxSortingOptions";
-            this.comboBoxSortingOptions.Size = new System.Drawing.Size(180, 23);
-            this.comboBoxSortingOptions.TabIndex = 70;
-            this.comboBoxSortingOptions.SelectedIndexChanged += new System.EventHandler(this.comboBoxSortingOptions_SelectedIndexChanged);
             // 
             // buttonSubmitPost
             // 
@@ -262,6 +188,8 @@ namespace FacebookDPApp.Forms
             // 
             // listBoxAlbums
             // 
+            this.listBoxAlbums.DataSource = this.albumBindingSource;
+            this.listBoxAlbums.DisplayMember = "Name";
             this.listBoxAlbums.Font = new System.Drawing.Font("Arial", 11F);
             this.listBoxAlbums.FormattingEnabled = true;
             this.listBoxAlbums.ItemHeight = 17;
@@ -296,6 +224,7 @@ namespace FacebookDPApp.Forms
             // 
             // tabPageProfile
             // 
+            this.tabPageProfile.AutoScroll = true;
             this.tabPageProfile.BackColor = System.Drawing.Color.Transparent;
             this.tabPageProfile.Controls.Add(this.textBoxSearchFriends);
             this.tabPageProfile.Controls.Add(this.listBoxFriendsList);
@@ -630,6 +559,7 @@ namespace FacebookDPApp.Forms
             this.tabControl.ResumeLayout(false);
             this.tabPageHome.ResumeLayout(false);
             this.tabPageHome.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.albumBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxAlbums)).EndInit();
             this.tabPageProfile.ResumeLayout(false);
             this.tabPageProfile.PerformLayout();
@@ -656,11 +586,7 @@ namespace FacebookDPApp.Forms
         private PictureBox pictureBoxAlbums;
         private ImageList imageList1;
         private CustomControls.RoundedButton buttonSubmitPost;
-        private ComboBox comboBoxSortingOptions;
-        private Label labelSortPosts;
         private ListBox listBoxPosts;
-        private CustomControls.RoundedButton buttonFetchPosts;
-        private CustomControls.RoundedButton buttonFetchAlbums;
         private TabPage tabPageProfile;
         private System.Windows.Forms.PictureBox coverPictureBox;
         private System.Windows.Forms.Panel panelMain;
@@ -683,6 +609,7 @@ namespace FacebookDPApp.Forms
         private System.Windows.Forms.ListBox listBoxUserInfo;
         private ListBox listBoxFriendsList;
         private TextBox textBoxSearchFriends;
+        private BindingSource albumBindingSource;
     }
  }
 
