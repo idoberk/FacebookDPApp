@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace FacebookDPApp.Backend
 {
@@ -14,7 +13,13 @@ namespace FacebookDPApp.Backend
         public User LoggedInUserFacade { get; private set; }
 
         private readonly List<MyPost> r_PostsList = new List<MyPost>();
-        private AlbumSlideShow m_AlbumSlideShowManager; // Ido- its not readOnly Now, not sure it is suppose to be here
+        private AlbumSlideShow m_AlbumSlideShowManager;
+
+        public event EventHandler<PhotoChangedEventArgs> PhotoChanged;
+
+        private FacebookServiceFacade()
+        {
+        }
 
         public static FacebookServiceFacade Instance
         {
@@ -35,9 +40,7 @@ namespace FacebookDPApp.Backend
             }
         }
 
-        public void InitFacebookServiceFacade(
-            User i_LoggedInUser,
-            PictureBox i_PictureBoxAlbums) // not good to send in pictureBox
+        public void InitFacebookServiceFacade(User i_LoggedInUser)
         {
             if (i_LoggedInUser == null)
             {
@@ -48,7 +51,8 @@ namespace FacebookDPApp.Backend
             {
                 LoggedInUserFacade = i_LoggedInUser;
                 setUserPostsList();
-                setUserAlbumsList(i_PictureBoxAlbums);
+                setUserAlbumsList();
+
             }
             catch (Exception ex)
             {
@@ -56,9 +60,15 @@ namespace FacebookDPApp.Backend
             }
         }
 
-        private void setUserAlbumsList(PictureBox i_PictureBoxAlbums)
+        private void setUserAlbumsList()
         {
-            m_AlbumSlideShowManager = new AlbumSlideShow(i_PictureBoxAlbums);
+            m_AlbumSlideShowManager = new AlbumSlideShow();
+            m_AlbumSlideShowManager.PhotoChanged += OnAlbumSlideShowPhotoChanged;
+        }
+
+        private void OnAlbumSlideShowPhotoChanged(object sender, PhotoChangedEventArgs e)
+        {
+            PhotoChanged?.Invoke(this, new PhotoChangedEventArgs(e.Photo));
         }
 
         private void setUserPostsList()
@@ -96,7 +106,7 @@ namespace FacebookDPApp.Backend
 
         public void StopSlideShow()
         {
-            m_AlbumSlideShowManager.StopSlideshow();
+            m_AlbumSlideShowManager?.StopSlideshow();
         }
 
         public void AddPost(string i_PostText)

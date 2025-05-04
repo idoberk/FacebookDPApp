@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using FacebookDPApp.Backend;
 using FacebookDPApp.CustomControls;
@@ -13,7 +12,8 @@ namespace FacebookDPApp.Forms
 {
     public partial class FormMain : Form
     {
-        private const string k_TextBoxPostPlaceHolderText = "What's on your mind? Share your thoughts with the community!";
+        private const string k_TextBoxPostPlaceHolderText =
+            "What's on your mind? Share your thoughts with the community!";
         private const string k_TextBoxSearchFriendsPlaceHolderText = "Search Friends...";
 
         private readonly User r_LoggedInUser;
@@ -45,7 +45,9 @@ namespace FacebookDPApp.Forms
         private void initFacebookServiceFacade()
         {
             m_facebookServiceFacade = FacebookServiceFacade.Instance;
-            m_facebookServiceFacade.InitFacebookServiceFacade(r_LoggedInUser, pictureBoxAlbums);
+            m_facebookServiceFacade.InitFacebookServiceFacade(r_LoggedInUser);
+
+            m_facebookServiceFacade.PhotoChanged += FacebookServiceFacade_PhotoChanged;
         }
 
         private void initSortingControls()
@@ -141,7 +143,8 @@ namespace FacebookDPApp.Forms
             if (m_facebookServiceFacade.GetUserPosts().Count == 0)
             {
                 MessageBox.Show("No Posts to load");
-            } else
+            }
+            else
             {
                 updatePostList();
             }
@@ -153,7 +156,7 @@ namespace FacebookDPApp.Forms
 
             FacebookObjectCollection<User> friendsList = m_UserDataManager.GetUserFriendsList();
 
-            foreach(User friend in friendsList)
+            foreach (User friend in friendsList)
             {
                 listBoxFriendsList.Invoke(new Action(() => listBoxFriendsList.Items.Add(friend.Name)));
             }
@@ -169,7 +172,10 @@ namespace FacebookDPApp.Forms
             {
                 if (myPost.Message != null)
                 {
-                    listBoxPosts.Invoke(new Action(() => listBoxPosts.Items.Add($"{myPost.Message} | Likes: {myPost.LikesCount} | Posted: {myPost.CreatedTime}")));
+                    listBoxPosts.Invoke(
+                        new Action(
+                            () => listBoxPosts.Items.Add(
+                                $"{myPost.Message} | Likes: {myPost.LikesCount} | Posted: {myPost.CreatedTime}")));
                 }
             }
         }
@@ -227,8 +233,6 @@ namespace FacebookDPApp.Forms
         private void listBox_Leave(object sender, EventArgs e)
         {
             listBoxPosts.ClearSelected();
-            // listBoxAlbums.ClearSelected();
-            // pictureBoxAlbums.Visible = false;
         }
 
         private void tabPageHome_MouseDown(object sender, MouseEventArgs e)
@@ -307,7 +311,7 @@ namespace FacebookDPApp.Forms
                     () =>
                         {
                             listBoxUserInfo.Items.Clear();
-                            foreach(string userInfo in m_UserDataManager.UserInfo)
+                            foreach (string userInfo in m_UserDataManager.UserInfo)
                             {
                                 listBoxUserInfo.Items.Add(userInfo);
                             }
@@ -316,7 +320,8 @@ namespace FacebookDPApp.Forms
 
         private void getProfilePhoto()
         {
-            profilePictureBox.Invoke(new Action(() => profilePictureBox.LoadAsync(m_UserDataManager.UserProfilePicURL)));
+            profilePictureBox.Invoke(
+                new Action(() => profilePictureBox.LoadAsync(m_UserDataManager.UserProfilePicURL)));
         }
 
         private void handleDataLoadingError(string i_ErrorMessage)
@@ -375,6 +380,24 @@ namespace FacebookDPApp.Forms
                 textBoxSearchFriends.ForeColor = SystemColors.ScrollBar;
                 fetchFriends();
             }
+        }
+
+        private void FacebookServiceFacade_PhotoChanged(object sender, PhotoChangedEventArgs e)
+        {
+            if (pictureBoxAlbums.InvokeRequired)
+            {
+                pictureBoxAlbums.Invoke(new Action(() => updatePictureBox(e.Photo)));
+            }
+            else
+            {
+                updatePictureBox(e.Photo);
+            }
+        }
+
+        private void updatePictureBox(Photo i_Photo)
+        {
+            pictureBoxAlbums.SizeMode = PictureBoxSizeMode.StretchImage;
+            pictureBoxAlbums.LoadAsync(i_Photo.PictureNormalURL);
         }
     }
 }
