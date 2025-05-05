@@ -19,7 +19,7 @@ namespace FacebookDPApp.Forms
         private readonly User r_LoggedInUser;
         private HigherLowerGameManager m_GameManager;
         private UserDataManager m_UserDataManager;
-        private FacebookServiceFacade m_facebookServiceFacade;
+        private FacebookServiceFacade m_FacebookServiceFacade;
         private SortingControl<MyPost> m_PostSortingControl;
 
         public FormMain(User i_LoggedInUser)
@@ -44,16 +44,16 @@ namespace FacebookDPApp.Forms
 
         private void initFacebookServiceFacade()
         {
-            m_facebookServiceFacade = FacebookServiceFacade.Instance;
-            m_facebookServiceFacade.InitFacebookServiceFacade(r_LoggedInUser);
+            m_FacebookServiceFacade = FacebookServiceFacade.Instance;
+            m_FacebookServiceFacade.InitFacebookServiceFacade(r_LoggedInUser);
 
-            m_facebookServiceFacade.PhotoChanged += FacebookServiceFacade_PhotoChanged;
+            m_FacebookServiceFacade.PhotoChanged += FacebookServiceFacade_PhotoChanged;
         }
 
         private void initSortingControls()
         {
             m_PostSortingControl =
-                SortingControlFactory.CreatePostSortingControl(new Point(654, 54), new Size(180, 50));
+                SortingControlFactory.CreatePostSortingControl(new Point(618, 54), new Size(210, 50));
 
             m_PostSortingControl.SortingChanged += PostSortingControl_SortingChanged;
 
@@ -119,14 +119,14 @@ namespace FacebookDPApp.Forms
         {
             if (sorter != null)
             {
-                m_facebookServiceFacade.Sort(sorter);
+                m_FacebookServiceFacade.Sort(sorter);
                 updatePostList();
             }
         }
 
         private void fetchAlbums()
         {
-            var allAlbums = m_facebookServiceFacade.GetUserAlbums();
+            var allAlbums = m_FacebookServiceFacade.GetUserAlbums();
 
             if (!listBoxAlbums.InvokeRequired)
             {
@@ -140,7 +140,7 @@ namespace FacebookDPApp.Forms
 
         private void fetchPosts()
         {
-            if (m_facebookServiceFacade.GetUserPosts().Count == 0)
+            if (m_FacebookServiceFacade.GetUserPosts().Count == 0)
             {
                 MessageBox.Show("No Posts to load");
             }
@@ -166,7 +166,7 @@ namespace FacebookDPApp.Forms
         {
             listBoxPosts.Invoke(new Action(() => listBoxPosts.Items.Clear()));
 
-            List<MyPost> postsList = m_facebookServiceFacade.GetUserPosts();
+            List<MyPost> postsList = m_FacebookServiceFacade.GetUserPosts();
 
             foreach (MyPost myPost in postsList)
             {
@@ -184,18 +184,18 @@ namespace FacebookDPApp.Forms
         {
             FacebookService.Logout();
             // FacebookService.LogoutWithUI();
-            m_facebookServiceFacade.StopSlideShow();
+            m_FacebookServiceFacade.StopSlideShow();
             pictureBoxAlbums.Visible = false;
             this.Invoke(new Action(this.Close));
         }
 
         private async void listBoxAlbums_SelectedIndexChanged(object sender, EventArgs e)
         {
-            m_facebookServiceFacade.StopSlideShow();
+            m_FacebookServiceFacade.StopSlideShow();
 
             if (listBoxAlbums.SelectedItem is Album selectedAlbum)
             {
-                m_facebookServiceFacade.StartSlidesShow(selectedAlbum);
+                m_FacebookServiceFacade.StartSlidesShow(selectedAlbum);
             }
         }
 
@@ -219,7 +219,7 @@ namespace FacebookDPApp.Forms
                 return;
             }
 
-            m_facebookServiceFacade.AddPost(newPostText);
+            m_FacebookServiceFacade.AddPost(newPostText);
             updatePostList();
             resetTextBoxFillStatusStyle();
         }

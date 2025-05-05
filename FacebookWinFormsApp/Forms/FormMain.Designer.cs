@@ -37,12 +37,12 @@ namespace FacebookDPApp.Forms
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.tabControl = new FacebookDPApp.CustomControls.CustomTabControl();
             this.tabPageHome = new System.Windows.Forms.TabPage();
-            this.albumBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.listBoxPosts = new System.Windows.Forms.ListBox();
             this.buttonSubmitPost = new FacebookDPApp.CustomControls.RoundedButton();
             this.pictureBoxAlbums = new System.Windows.Forms.PictureBox();
             this.textBoxFillStatus = new System.Windows.Forms.TextBox();
             this.listBoxAlbums = new System.Windows.Forms.ListBox();
+            this.albumBindingSource = new System.Windows.Forms.BindingSource(this.components);
             this.buttonLogout = new FacebookDPApp.CustomControls.RoundedButton();
             this.tabPageProfile = new System.Windows.Forms.TabPage();
             this.textBoxSearchFriends = new System.Windows.Forms.TextBox();
@@ -69,8 +69,8 @@ namespace FacebookDPApp.Forms
             this.labelScore = new System.Windows.Forms.Label();
             this.tabControl.SuspendLayout();
             this.tabPageHome.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.albumBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxAlbums)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.albumBindingSource)).BeginInit();
             this.tabPageProfile.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.profilePictureBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.coverPictureBox)).BeginInit();
@@ -128,10 +128,6 @@ namespace FacebookDPApp.Forms
             this.tabPageHome.UseVisualStyleBackColor = true;
             this.tabPageHome.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tabPageHome_MouseDown);
             // 
-            // albumBindingSource
-            // 
-            this.albumBindingSource.DataSource = typeof(FacebookWrapper.ObjectModel.Album);
-            // 
             // listBoxPosts
             // 
             this.listBoxPosts.Font = new System.Drawing.Font("Arial", 9F);
@@ -139,7 +135,7 @@ namespace FacebookDPApp.Forms
             this.listBoxPosts.ItemHeight = 15;
             this.listBoxPosts.Location = new System.Drawing.Point(8, 54);
             this.listBoxPosts.Name = "listBoxPosts";
-            this.listBoxPosts.Size = new System.Drawing.Size(640, 214);
+            this.listBoxPosts.Size = new System.Drawing.Size(604, 214);
             this.listBoxPosts.TabIndex = 59;
             this.listBoxPosts.Leave += new System.EventHandler(this.listBox_Leave);
             // 
@@ -198,6 +194,10 @@ namespace FacebookDPApp.Forms
             this.listBoxAlbums.Size = new System.Drawing.Size(326, 191);
             this.listBoxAlbums.TabIndex = 56;
             this.listBoxAlbums.SelectedIndexChanged += new System.EventHandler(this.listBoxAlbums_SelectedIndexChanged);
+            // 
+            // albumBindingSource
+            // 
+            this.albumBindingSource.DataSource = typeof(FacebookWrapper.ObjectModel.Album);
             // 
             // buttonLogout
             // 
@@ -559,8 +559,8 @@ namespace FacebookDPApp.Forms
             this.tabControl.ResumeLayout(false);
             this.tabPageHome.ResumeLayout(false);
             this.tabPageHome.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.albumBindingSource)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxAlbums)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.albumBindingSource)).EndInit();
             this.tabPageProfile.ResumeLayout(false);
             this.tabPageProfile.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.profilePictureBox)).EndInit();

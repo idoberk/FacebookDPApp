@@ -54,7 +54,7 @@ namespace FacebookDPApp.CustomControls
             r_ComboBoxSortingOptions.Font = new Font("Arial", 9F);
             r_ComboBoxSortingOptions.Location = new Point(0, 25);
             r_ComboBoxSortingOptions.Name = "comboBoxSortingOptions";
-            r_ComboBoxSortingOptions.Size = new Size(250, 23);
+            r_ComboBoxSortingOptions.Size = new Size(210, 23);
             this.Controls.Add(r_ComboBoxSortingOptions);
         }
 

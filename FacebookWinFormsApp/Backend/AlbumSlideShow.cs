@@ -12,12 +12,10 @@ namespace FacebookDPApp.Backend
         private readonly Timer r_Timer;
         private List<Photo> m_PhotoList;
         private int m_CurrentPhotoIndex;
-        // private readonly PictureBox r_PictureBox;
         private const int k_SlideShowIntervalMs = 3000;
 
         public AlbumSlideShow()
         {
-            // r_PictureBox = i_PictureBox;
             m_CurrentPhotoIndex = 0;
             m_PhotoList = new List<Photo>();
 
@@ -37,7 +35,6 @@ namespace FacebookDPApp.Backend
 
             m_PhotoList = i_PhotoList;
             m_CurrentPhotoIndex = 0;
-            // displayCurrentPhoto();
             notifyPhotoChanged();
             r_Timer.Start();
         }
@@ -47,7 +44,6 @@ namespace FacebookDPApp.Backend
             if (m_PhotoList.Count > 0)
             {
                 m_CurrentPhotoIndex = (m_CurrentPhotoIndex + 1) % m_PhotoList.Count;
-                // displayCurrentPhoto();
                 notifyPhotoChanged();
             }
         }
@@ -64,16 +60,6 @@ namespace FacebookDPApp.Backend
         {
             PhotoChanged?.Invoke(this, e);
         }
-
-
-        //private void displayCurrentPhoto()
-        //{
-        //    if (m_PhotoList.Count > 0)
-        //    {
-        //        r_PictureBox.SizeMode = PictureBoxSizeMode.StretchImage;
-        //        r_PictureBox.LoadAsync(m_PhotoList[m_CurrentPhotoIndex].PictureNormalURL);
-        //    }
-        //}
 
         public void StopSlideshow()
         {

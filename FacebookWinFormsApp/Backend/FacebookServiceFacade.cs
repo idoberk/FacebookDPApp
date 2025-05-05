@@ -52,7 +52,6 @@ namespace FacebookDPApp.Backend
                 LoggedInUserFacade = i_LoggedInUser;
                 setUserPostsList();
                 setUserAlbumsList();
-
             }
             catch (Exception ex)
             {
@@ -73,11 +72,7 @@ namespace FacebookDPApp.Backend
 
         private void setUserPostsList()
         {
-            if (LoggedInUserFacade.Posts.Count == 0)
-            {
-                
-            }
-            else
+            if (LoggedInUserFacade.Posts.Count != 0)
             {
                 foreach (Post post in LoggedInUserFacade.Posts)
                 {
@@ -114,20 +109,10 @@ namespace FacebookDPApp.Backend
             r_PostsList.Insert(0, new MyPost(i_PostText, DateTime.Now));
         }
 
-        //public void Sort(int i_SortingChoice)
-        //{
-        //    r_PostsList.Sort(new PostSorter(i_SortingChoice));
-        //}
-
         public void Sort(SortComponent<MyPost> i_Sorter)
         {
             r_PostsList.Sort(i_Sorter);
         }
-
-        //public void StartSlidesShow(List<Photo> photos)
-        //{
-        //    m_AlbumSlideShowManager.StartSlideshow(photos);
-        //}
 
         public async void StartSlidesShow(Album i_SelectedAlbum)
         {

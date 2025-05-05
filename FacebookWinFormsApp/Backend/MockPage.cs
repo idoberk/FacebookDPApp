@@ -11,18 +11,12 @@ namespace FacebookDPApp.Backend
 
         public long LikesCount
         {
-            get
-            {
-                return r_FictionalLikesCount;
-            }
+            get { return r_FictionalLikesCount; }
         }
 
         public string Id
         {
-            get
-            {
-                return r_OriginalPage.Id;
-            }
+            get { return r_OriginalPage.Id; }
         }
 
         public MockPage(Page i_OriginalPage)
