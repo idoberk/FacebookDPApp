@@ -33,8 +33,7 @@ namespace FacebookDPApp.CustomControls
             }
         }
 
-        public SortingControl()
-            : base()
+        public SortingControl() : base()
         {
             r_ComboBoxSortingOptions.SelectedIndexChanged += r_ComboBoxSortingOptions_SelectedIndexChanged;
         }
@@ -59,35 +58,6 @@ namespace FacebookDPApp.CustomControls
                 r_SortOptions.Add(i_OptionText, i_Sorter);
                 AddSortOptionText(i_OptionText);
             }
-        }
-
-        public bool SortList(List<T> i_List)
-        {
-            bool isSorted = false;
-
-            if (SelectedSorter != null && i_List != null)
-            {
-                i_List.Sort(SelectedSorter);
-                isSorted = true;
-            }
-
-            return isSorted;
-        }
-
-        public void ClearSortOptions()
-        {
-            r_SortOptions.Clear();
-            ClearSortingOptions();
-        }
-
-        public bool SelectSortOption(string i_OptionText)
-        {
-            return SelectSortOptionText(i_OptionText);
-        }
-
-        public bool SelectSortOption(int i_Index)
-        {
-            return SelectSortOptionIndex(i_Index);
         }
     }
 }

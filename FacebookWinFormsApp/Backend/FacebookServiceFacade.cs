@@ -114,7 +114,7 @@ namespace FacebookDPApp.Backend
             r_PostsList.Sort(i_Sorter);
         }
 
-        public async void StartSlidesShow(Album i_SelectedAlbum)
+        public async void StartSlideShow(Album i_SelectedAlbum)
         {
             List<Photo> photos = await fetchPhotosFromSelectedAlbum(i_SelectedAlbum);
             m_AlbumSlideShowManager.StartSlideshow(photos);

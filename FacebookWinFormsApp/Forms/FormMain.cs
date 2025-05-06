@@ -126,15 +126,15 @@ namespace FacebookDPApp.Forms
 
         private void fetchAlbums()
         {
-            var allAlbums = m_FacebookServiceFacade.GetUserAlbums();
+            FacebookObjectCollection<Album> albumsList = m_FacebookServiceFacade.GetUserAlbums();
 
             if (!listBoxAlbums.InvokeRequired)
             {
-                albumBindingSource.DataSource = allAlbums;
+                albumBindingSource.DataSource = albumsList;
             }
             else
             {
-                listBoxAlbums.Invoke(new Action(() => albumBindingSource.DataSource = allAlbums));
+                listBoxAlbums.Invoke(new Action(() => albumBindingSource.DataSource = albumsList));
             }
         }
 
@@ -182,10 +182,7 @@ namespace FacebookDPApp.Forms
 
         private void buttonLogout_Click(object sender, EventArgs e)
         {
-            FacebookService.Logout();
-            // FacebookService.LogoutWithUI();
-            m_FacebookServiceFacade.StopSlideShow();
-            pictureBoxAlbums.Visible = false;
+            FacebookService.LogoutWithUI();
             this.Invoke(new Action(this.Close));
         }
 
@@ -195,7 +192,13 @@ namespace FacebookDPApp.Forms
 
             if (listBoxAlbums.SelectedItem is Album selectedAlbum)
             {
-                m_FacebookServiceFacade.StartSlidesShow(selectedAlbum);
+                m_FacebookServiceFacade.StartSlideShow(selectedAlbum);
+
+                if (selectedAlbum.Photos.Count != 0)
+                {
+                    buttonStopSlideshow.Visible = true;
+                    pictureBoxAlbums.Visible = true;
+                }
             }
         }
 
@@ -398,6 +401,15 @@ namespace FacebookDPApp.Forms
         {
             pictureBoxAlbums.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBoxAlbums.LoadAsync(i_Photo.PictureNormalURL);
+        }
+
+        private void buttonStopSlideshow_Click(object sender, EventArgs e)
+        {
+            m_FacebookServiceFacade.StopSlideShow();
+            pictureBoxAlbums.Image = null;
+            buttonStopSlideshow.Visible = false;
+            pictureBoxAlbums.Visible = false;
+            listBoxAlbums.ClearSelected();
         }
     }
 }

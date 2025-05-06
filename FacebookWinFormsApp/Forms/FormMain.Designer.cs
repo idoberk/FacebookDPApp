@@ -37,6 +37,7 @@ namespace FacebookDPApp.Forms
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.tabControl = new FacebookDPApp.CustomControls.CustomTabControl();
             this.tabPageHome = new System.Windows.Forms.TabPage();
+            this.buttonStopSlideshow = new FacebookDPApp.CustomControls.RoundedButton();
             this.listBoxPosts = new System.Windows.Forms.ListBox();
             this.buttonSubmitPost = new FacebookDPApp.CustomControls.RoundedButton();
             this.pictureBoxAlbums = new System.Windows.Forms.PictureBox();
@@ -113,6 +114,7 @@ namespace FacebookDPApp.Forms
             // 
             this.tabPageHome.AutoScroll = true;
             this.tabPageHome.BackColor = System.Drawing.Color.Transparent;
+            this.tabPageHome.Controls.Add(this.buttonStopSlideshow);
             this.tabPageHome.Controls.Add(this.listBoxPosts);
             this.tabPageHome.Controls.Add(this.buttonSubmitPost);
             this.tabPageHome.Controls.Add(this.pictureBoxAlbums);
@@ -127,6 +129,26 @@ namespace FacebookDPApp.Forms
             this.tabPageHome.ToolTipText = "Home";
             this.tabPageHome.UseVisualStyleBackColor = true;
             this.tabPageHome.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tabPageHome_MouseDown);
+            // 
+            // buttonStopSlideshow
+            // 
+            this.buttonStopSlideshow.BackColor = System.Drawing.Color.DodgerBlue;
+            this.buttonStopSlideshow.BackgroundColor = System.Drawing.Color.DodgerBlue;
+            this.buttonStopSlideshow.BorderColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.buttonStopSlideshow.BorderRadius = 10;
+            this.buttonStopSlideshow.BorderSize = 3;
+            this.buttonStopSlideshow.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.buttonStopSlideshow.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold);
+            this.buttonStopSlideshow.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.buttonStopSlideshow.Location = new System.Drawing.Point(8, 478);
+            this.buttonStopSlideshow.Name = "buttonStopSlideshow";
+            this.buttonStopSlideshow.Size = new System.Drawing.Size(141, 35);
+            this.buttonStopSlideshow.TabIndex = 65;
+            this.buttonStopSlideshow.Text = "Stop Slideshow";
+            this.buttonStopSlideshow.TextColor = System.Drawing.SystemColors.ButtonHighlight;
+            this.buttonStopSlideshow.UseVisualStyleBackColor = false;
+            this.buttonStopSlideshow.Visible = false;
+            this.buttonStopSlideshow.Click += new System.EventHandler(this.buttonStopSlideshow_Click);
             // 
             // listBoxPosts
             // 
@@ -163,7 +185,7 @@ namespace FacebookDPApp.Forms
             // 
             // pictureBoxAlbums
             // 
-            this.pictureBoxAlbums.Location = new System.Drawing.Point(340, 290);
+            this.pictureBoxAlbums.Location = new System.Drawing.Point(340, 284);
             this.pictureBoxAlbums.Name = "pictureBoxAlbums";
             this.pictureBoxAlbums.Size = new System.Drawing.Size(249, 191);
             this.pictureBoxAlbums.TabIndex = 63;
@@ -189,7 +211,7 @@ namespace FacebookDPApp.Forms
             this.listBoxAlbums.Font = new System.Drawing.Font("Arial", 11F);
             this.listBoxAlbums.FormattingEnabled = true;
             this.listBoxAlbums.ItemHeight = 17;
-            this.listBoxAlbums.Location = new System.Drawing.Point(8, 290);
+            this.listBoxAlbums.Location = new System.Drawing.Point(8, 284);
             this.listBoxAlbums.Name = "listBoxAlbums";
             this.listBoxAlbums.Size = new System.Drawing.Size(326, 191);
             this.listBoxAlbums.TabIndex = 56;
@@ -610,6 +632,7 @@ namespace FacebookDPApp.Forms
         private ListBox listBoxFriendsList;
         private TextBox textBoxSearchFriends;
         private BindingSource albumBindingSource;
+        private RoundedButton buttonStopSlideshow;
     }
  }
 
