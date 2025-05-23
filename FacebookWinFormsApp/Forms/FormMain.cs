@@ -10,7 +10,7 @@ using FacebookWrapper.ObjectModel;
 
 namespace FacebookDPApp.Forms
 {
-    public partial class FormMain : Form
+    public partial class FormMain : Form, IDataFetchedObserver
     {
         private const string k_TextBoxPostPlaceHolderText =
             "What's on your mind? Share your thoughts with the community!";
@@ -18,7 +18,7 @@ namespace FacebookDPApp.Forms
 
         private readonly User r_LoggedInUser;
         private HigherLowerGameManager m_GameManager;
-        private UserDataManager m_UserDataManager;
+        // private UserDataManager m_UserDataManager;
         private FacebookServiceFacade m_FacebookServiceFacade;
         private SortingControl<MyPost> m_PostSortingControl;
 
@@ -29,32 +29,35 @@ namespace FacebookDPApp.Forms
 
             textBoxFillStatus.LostFocus += textBoxFillStatus_LostFocus;
 
-            initUserDataManager();
+            // initUserDataManager();
+            //new Thread(initFacebookServiceFacade).Start();
             initFacebookServiceFacade();
-            initSortingControls();
-            setupContextMenu();
         }
 
-        private void initUserDataManager()
-        {
-            m_UserDataManager = UserDataManager.Instance;
+        //private void initUserDataManager()
+        //{
+        //    m_UserDataManager = UserDataManager.Instance;
 
-            m_UserDataManager.InitUserData(r_LoggedInUser);
-        }
+        //    m_UserDataManager.InitUserData(r_LoggedInUser);
+        //}
 
         private void initFacebookServiceFacade()
         {
-            m_FacebookServiceFacade = FacebookServiceFacade.Instance;
+            // m_FacebookServiceFacade = FacebookServiceFacade.Instance;
+            m_FacebookServiceFacade = new FacebookServiceFacade();
 
-            // m_FacebookServiceFace.AttachObserver(observer);
+            m_FacebookServiceFacade.AttachObserver(this as IDataFetchedObserver);
             m_FacebookServiceFacade.InitFacebookServiceFacade(r_LoggedInUser);
             m_FacebookServiceFacade.PhotoChanged += FacebookServiceFacade_PhotoChanged;
         }
 
-        //public void AllDataInitialized()
-        //{
-
-        //}
+        public void AllDataFetched()
+        {
+            //updateUIWithUserData();
+            new Thread(updateUIWithUserData).Start();
+            initSortingControls();
+            setupContextMenu();
+        }
 
         private void initSortingControls()
         {
@@ -160,7 +163,7 @@ namespace FacebookDPApp.Forms
         {
             listBoxFriendsList.Invoke(new Action(() => listBoxFriendsList.Items.Clear()));
 
-            FacebookObjectCollection<User> friendsList = m_UserDataManager.GetUserFriendsList();
+            FacebookObjectCollection<User> friendsList = m_FacebookServiceFacade.GetUserFriendsList();
 
             foreach (User friend in friendsList)
             {
@@ -288,14 +291,14 @@ namespace FacebookDPApp.Forms
 
         private void FormMain_Load(object sender, EventArgs e)
         {
-            updateUIWithUserData();
+            // updateUIWithUserData();
         }
 
         private void updateUIWithUserData()
         {
             try
             {
-                labelUserName.Invoke(new Action(() => labelUserName.Text = m_UserDataManager.UserName));
+                labelUserName.Invoke(new Action(() => labelUserName.Text = m_FacebookServiceFacade.UserName));
                 new Thread(getProfilePhoto).Start();
                 new Thread(getCoverPhoto).Start();
                 new Thread(getUserInfo).Start();
@@ -311,27 +314,31 @@ namespace FacebookDPApp.Forms
 
         private void getCoverPhoto()
         {
-            coverPictureBox.Invoke(new Action(() => coverPictureBox.LoadAsync(m_UserDataManager.UserCoverPicURL)));
+            coverPictureBox.Invoke(new Action(() => coverPictureBox.LoadAsync(m_FacebookServiceFacade.UserCoverPicURL)));
         }
 
         private void getUserInfo()
         {
-            listBoxUserInfo.Invoke(
-                new Action(
-                    () =>
-                        {
-                            listBoxUserInfo.Items.Clear();
-                            foreach (string userInfo in m_UserDataManager.UserInfo)
-                            {
-                                listBoxUserInfo.Items.Add(userInfo);
-                            }
-                        }));
+            //listBoxUserInfo.Invoke(
+            //    new Action(
+            //        () =>
+            //            {
+            //                listBoxUserInfo.Items.Clear();
+            //                foreach(string userInfo in m_FacebookServiceFacade.UserInfo)
+            //                {
+            //                    listBoxUserInfo.Items.Add(userInfo);
+            //                }
+            //            }));
+            foreach(string userInfo in m_FacebookServiceFacade.UserInfo)
+            {
+                listBoxUserInfo.Invoke(new Action(() => listBoxUserInfo.Items.Add(userInfo)));
+            }
         }
 
         private void getProfilePhoto()
         {
             profilePictureBox.Invoke(
-                new Action(() => profilePictureBox.LoadAsync(m_UserDataManager.UserProfilePicURL)));
+                new Action(() => profilePictureBox.LoadAsync(m_FacebookServiceFacade.UserProfilePicURL)));
         }
 
         private void handleDataLoadingError(string i_ErrorMessage)
@@ -368,7 +375,7 @@ namespace FacebookDPApp.Forms
         {
             listBoxFriendsList.Items.Clear();
 
-            foreach (User friend in m_UserDataManager.UserFriends)
+            foreach (User friend in m_FacebookServiceFacade.UserFriends)
             {
                 if (friend.Name.StartsWith(textBoxSearchFriends.Text, StringComparison.CurrentCultureIgnoreCase))
                 {

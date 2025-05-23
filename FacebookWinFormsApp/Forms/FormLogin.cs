@@ -20,7 +20,7 @@ namespace FacebookDPApp.Forms
         {
             InitializeComponent();
             centerButton();
-            FacebookService.s_CollectionLimit = 25;
+            FacebookService.s_CollectionLimit = 5;
         }
 
         private void centerButton()
@@ -41,7 +41,9 @@ namespace FacebookDPApp.Forms
             try
             {
                 m_LoginResult = FacebookService.Connect(
-                    "EAAJfwfccn2sBOwG8fFuwW1wzenHyCZAd9Pt92pzeZCzqbt7jBoAim25Cs9jZAMZAbR3VFMDTbVJwiY8XXVoBTHfLt4AQ2yviB6c9R5S6at5RTgTqh2ZAC6L8ey0tWPYZCfjmusuyd9rBCVx1CFORNlcbT96qYIaVpu3anWTcRtvFc73yfcmRaohi15Q9aI7lHaJIyQaaSgKcLLtEuJaiqMIludb202CZAFtQXpLxQZDZD");
+                    "EAAJfwfccn2sBO6MMBFf7zqQLhvxLSuZBr7ZAtRWvBfaF0phRDXRY628rbWKjHH6JUbOpZCDFOIReSrVhYcsxxRDhtqB7ZCnskvrlRGadYjBZAa7iF2RGLRt3OPJuvJpm0QO6d8KVyy7Uyz8Oj4T4mfSxhaDbPWdjf10fB2uEX5UCE3LHHfOZBhZCVKqfL4zjZCspB0mGETvLMqlZB8bPRfNlCDsQZD");
+                //m_LoginResult = FacebookService.Connect(
+                //    "EAAJfwfccn2sBOZBPnPk4si1JHuyz0GxAjTSEX6J1fBj7E8SUtZAw1w0LryvPtdz8f6hOZAwjzdwoUQQ4vEfWlKQjBw0BvRbcEcYwZA9Lc4RhCQ7hfrmCb7i1H4Xbgz0MPmC3MPjNKAGUTSYz7KB7JSxqSae4YvfhDN1HisZCyQi2ZBvmSy0LuhOSSTZA7VvbxBuXbxgiym1A2drT5IJdghFVOZAGLY1wnQQYYdlxhg5xLRe6Vb7hZAZBcI6dQZD");
                 //m_LoginResult = FacebookService.Login(k_AppID, sr_AppPermissions);
 
                 if (!string.IsNullOrEmpty(m_LoginResult.AccessToken))
