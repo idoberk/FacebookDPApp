@@ -45,10 +45,16 @@ namespace FacebookDPApp.Forms
         private void initFacebookServiceFacade()
         {
             m_FacebookServiceFacade = FacebookServiceFacade.Instance;
-            m_FacebookServiceFacade.InitFacebookServiceFacade(r_LoggedInUser);
 
+            // m_FacebookServiceFace.AttachObserver(observer);
+            m_FacebookServiceFacade.InitFacebookServiceFacade(r_LoggedInUser);
             m_FacebookServiceFacade.PhotoChanged += FacebookServiceFacade_PhotoChanged;
         }
+
+        //public void AllDataInitialized()
+        //{
+
+        //}
 
         private void initSortingControls()
         {
@@ -182,7 +188,8 @@ namespace FacebookDPApp.Forms
 
         private void buttonLogout_Click(object sender, EventArgs e)
         {
-            FacebookService.LogoutWithUI();
+            FacebookService.Logout();
+            // FacebookService.LogoutWithUI();
             this.Invoke(new Action(this.Close));
         }
 

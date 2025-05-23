@@ -40,6 +40,21 @@ namespace FacebookDPApp.Backend
             }
         }
 
+        //public void AttachObserver(IObserver<>)
+        //{
+        //    add
+        //}
+
+        //dowhendatainitialize()
+        //{
+        //    notify
+        //}
+
+        //NotifyCollectionChangedAction()
+        //{
+        //    observer.alldatainitialized
+        //}
+
         public void InitFacebookServiceFacade(User i_LoggedInUser)
         {
             if (i_LoggedInUser == null)
