@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using FacebookDPApp.Backend;
 using FacebookDPApp.CustomControls;
@@ -18,7 +18,6 @@ namespace FacebookDPApp.Forms
 
         private readonly User r_LoggedInUser;
         private HigherLowerGameManager m_GameManager;
-        // private UserDataManager m_UserDataManager;
         private FacebookServiceFacade m_FacebookServiceFacade;
         private SortingControl<MyPost> m_PostSortingControl;
 
@@ -29,34 +28,70 @@ namespace FacebookDPApp.Forms
 
             textBoxFillStatus.LostFocus += textBoxFillStatus_LostFocus;
 
-            // initUserDataManager();
-            //new Thread(initFacebookServiceFacade).Start();
             initFacebookServiceFacade();
         }
 
-        //private void initUserDataManager()
-        //{
-        //    m_UserDataManager = UserDataManager.Instance;
-
-        //    m_UserDataManager.InitUserData(r_LoggedInUser);
-        //}
-
         private void initFacebookServiceFacade()
         {
-            // m_FacebookServiceFacade = FacebookServiceFacade.Instance;
-            m_FacebookServiceFacade = new FacebookServiceFacade();
+            try
+            {
+                m_FacebookServiceFacade = FacebookServiceFacade.Instance;
 
-            m_FacebookServiceFacade.AttachObserver(this as IDataFetchedObserver);
-            m_FacebookServiceFacade.InitFacebookServiceFacade(r_LoggedInUser);
-            m_FacebookServiceFacade.PhotoChanged += FacebookServiceFacade_PhotoChanged;
+                m_FacebookServiceFacade.AttachObserver(this as IDataFetchedObserver);
+                m_FacebookServiceFacade.PhotoChanged += FacebookServiceFacade_PhotoChanged;
+
+                Task.Run(
+                    () =>
+                        {
+                            try
+                            {
+                                m_FacebookServiceFacade.InitFacebookServiceFacade(r_LoggedInUser);
+                            }
+                            catch (Exception ex)
+                            {
+                                this.Invoke(
+                                    new Action(
+                                        () =>
+                                            {
+                                                MessageBox.Show(
+                                                    $"Failed to initialize Facebook data: {ex.Message}",
+                                                    "Initialization Error",
+                                                    MessageBoxButtons.OK,
+                                                    MessageBoxIcon.Error);
+                                            }));
+                            }
+                        });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error setting up Facebook service: {ex.Message}",
+                    "Setup Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
         }
 
         public void AllDataFetched()
         {
-            //updateUIWithUserData();
-            new Thread(updateUIWithUserData).Start();
-            initSortingControls();
-            setupContextMenu();
+            try
+            {
+                if (this.InvokeRequired)
+                {
+                    this.Invoke(new Action(AllDataFetched));
+                }
+                else
+                {
+                    updateUIWithUserData();
+                    initSortingControls();
+                    setupContextMenu();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error updating UI after data fetch: {ex.Message}",
+                    "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
         }
 
         private void initSortingControls()
@@ -133,44 +168,6 @@ namespace FacebookDPApp.Forms
             }
         }
 
-        private void fetchAlbums()
-        {
-            FacebookObjectCollection<Album> albumsList = m_FacebookServiceFacade.GetUserAlbums();
-
-            if (!listBoxAlbums.InvokeRequired)
-            {
-                albumBindingSource.DataSource = albumsList;
-            }
-            else
-            {
-                listBoxAlbums.Invoke(new Action(() => albumBindingSource.DataSource = albumsList));
-            }
-        }
-
-        private void fetchPosts()
-        {
-            if (m_FacebookServiceFacade.GetUserPosts().Count == 0)
-            {
-                MessageBox.Show("No Posts to load");
-            }
-            else
-            {
-                updatePostList();
-            }
-        }
-
-        private void fetchFriends()
-        {
-            listBoxFriendsList.Invoke(new Action(() => listBoxFriendsList.Items.Clear()));
-
-            FacebookObjectCollection<User> friendsList = m_FacebookServiceFacade.GetUserFriendsList();
-
-            foreach (User friend in friendsList)
-            {
-                listBoxFriendsList.Invoke(new Action(() => listBoxFriendsList.Items.Add(friend.Name)));
-            }
-        }
-
         private void updatePostList()
         {
             listBoxPosts.Invoke(new Action(() => listBoxPosts.Items.Clear()));
@@ -196,7 +193,7 @@ namespace FacebookDPApp.Forms
             this.Invoke(new Action(this.Close));
         }
 
-        private async void listBoxAlbums_SelectedIndexChanged(object sender, EventArgs e)
+        private void listBoxAlbums_SelectedIndexChanged(object sender, EventArgs e)
         {
             m_FacebookServiceFacade.StopSlideShow();
 
@@ -287,24 +284,33 @@ namespace FacebookDPApp.Forms
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             m_GameManager?.Cleanup();
-        }
-
-        private void FormMain_Load(object sender, EventArgs e)
-        {
-            // updateUIWithUserData();
+            m_FacebookServiceFacade.DetachObserver(this as IDataFetchedObserver);
+            m_FacebookServiceFacade.PhotoChanged -= FacebookServiceFacade_PhotoChanged;
+            m_FacebookServiceFacade.StopSlideShow();
         }
 
         private void updateUIWithUserData()
         {
             try
             {
-                labelUserName.Invoke(new Action(() => labelUserName.Text = m_FacebookServiceFacade.UserName));
-                new Thread(getProfilePhoto).Start();
-                new Thread(getCoverPhoto).Start();
-                new Thread(getUserInfo).Start();
-                new Thread(fetchFriends).Start();
-                new Thread(fetchPosts).Start();
-                new Thread(fetchAlbums).Start();
+                if (m_FacebookServiceFacade != null)
+                {
+                    labelUserName.Text = m_FacebookServiceFacade.UserName ?? "Unknown User";
+
+                    loadProfilePhoto();
+                    loadCoverPhoto();
+                    updateUserInfoListAsync();
+                    updateFriendsListAsync();
+                    updatePostsListAsync();
+                    updateAlbumsListAsync();
+
+                    //new Thread(getProfilePhoto) {IsBackground = true }.Start();
+                    //new Thread(getCoverPhoto) { IsBackground = true }.Start();
+                    //new Thread(getUserInfo) { IsBackground = true }.Start();
+                    //new Thread(fetchFriends) { IsBackground = true }.Start();
+                    //new Thread(fetchPosts) { IsBackground = true }.Start();
+                    //new Thread(fetchAlbums) { IsBackground = true }.Start();
+                }
             }
             catch (Exception ex)
             {
@@ -312,33 +318,59 @@ namespace FacebookDPApp.Forms
             }
         }
 
-        private void getCoverPhoto()
+        private void loadCoverPhoto()
         {
-            coverPictureBox.Invoke(new Action(() => coverPictureBox.LoadAsync(m_FacebookServiceFacade.UserCoverPicURL)));
+            coverPictureBox.LoadAsync(m_FacebookServiceFacade.UserCoverPicURL);
         }
 
-        private void getUserInfo()
+        private void loadProfilePhoto()
         {
-            //listBoxUserInfo.Invoke(
-            //    new Action(
-            //        () =>
-            //            {
-            //                listBoxUserInfo.Items.Clear();
-            //                foreach(string userInfo in m_FacebookServiceFacade.UserInfo)
-            //                {
-            //                    listBoxUserInfo.Items.Add(userInfo);
-            //                }
-            //            }));
+            profilePictureBox.LoadAsync(m_FacebookServiceFacade.UserProfilePicURL);
+        }
+
+        private void updateUserInfoListAsync()
+        {
+            listBoxUserInfo.Items.Clear();
             foreach(string userInfo in m_FacebookServiceFacade.UserInfo)
             {
-                listBoxUserInfo.Invoke(new Action(() => listBoxUserInfo.Items.Add(userInfo)));
+                listBoxUserInfo.Items.Add(userInfo);
             }
         }
 
-        private void getProfilePhoto()
+        private void updateFriendsListAsync()
         {
-            profilePictureBox.Invoke(
-                new Action(() => profilePictureBox.LoadAsync(m_FacebookServiceFacade.UserProfilePicURL)));
+            listBoxFriendsList.Items.Clear();
+
+            FacebookObjectCollection<User> friendsList = m_FacebookServiceFacade.GetUserFriendsList();
+
+            if(friendsList.Count == 0)
+            {
+                listBoxFriendsList.Items.Add("No friends found!");
+            } else
+            {
+                foreach(User friend in friendsList)
+                {
+                    listBoxFriendsList.Items.Add(friend.Name);
+                }
+            }
+        }
+
+        private void updatePostsListAsync()
+        {
+            if(m_FacebookServiceFacade.GetUserPosts().Count == 0)
+            {
+                MessageBox.Show("No Posts to load");
+            } else
+            {
+                updatePostList();
+            }
+        }
+
+        private void updateAlbumsListAsync()
+        {
+            FacebookObjectCollection<Album> albumsList = m_FacebookServiceFacade.GetUserAlbums();
+
+            albumBindingSource.DataSource = albumsList;
         }
 
         private void handleDataLoadingError(string i_ErrorMessage)
@@ -395,7 +427,7 @@ namespace FacebookDPApp.Forms
             {
                 textBoxSearchFriends.Text = k_TextBoxSearchFriendsPlaceHolderText;
                 textBoxSearchFriends.ForeColor = SystemColors.ScrollBar;
-                fetchFriends();
+                updateFriendsListAsync();
             }
         }
 

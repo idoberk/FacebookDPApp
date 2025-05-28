@@ -14,7 +14,6 @@ namespace FacebookDPApp.Backend
 
     public delegate void TimeExpiredEventHandler(object sender, EventArgs e);
 
-
     public class HigherLowerGameLogic
     {
         private const int k_TimeLimitSeconds = 15;

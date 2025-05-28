@@ -1,15 +1,16 @@
-﻿using FacebookWrapper.ObjectModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FacebookWrapper.ObjectModel;
 
 namespace FacebookDPApp.Backend
 {
     public sealed class FacebookServiceFacade
     {
-        // private static FacebookServiceFacade s_Instance;
+        private static FacebookServiceFacade s_Instance;
         private static readonly object sr_LockObject = new object();
+        private static readonly object sr_InitLock = new object();
 
         private readonly List<IDataFetchedObserver> r_DataFetchedObservers = new List<IDataFetchedObserver>();
 
@@ -39,35 +40,30 @@ namespace FacebookDPApp.Backend
 
         public event EventHandler<PhotoChangedEventArgs> PhotoChanged;
 
-        public FacebookServiceFacade()
+        private FacebookServiceFacade()
         {
-            
+            UserInfo = new FacebookObjectCollection<string>();
+            UserFriends = new FacebookObjectCollection<User>();
         }
 
-        //private FacebookServiceFacade()
-        //{
-        //    UserInfo = new FacebookObjectCollection<string>();
-        //    UserFriends = new FacebookObjectCollection<User>();
-        //}
+        public static FacebookServiceFacade Instance
+        {
+            get
+            {
+                if(s_Instance == null)
+                {
+                    lock(sr_LockObject)
+                    {
+                        if(s_Instance == null)
+                        {
+                            s_Instance = new FacebookServiceFacade();
+                        }
+                    }
+                }
 
-        //public static FacebookServiceFacade Instance
-        //{
-        //    get
-        //    {
-        //        if (s_Instance == null)
-        //        {
-        //            lock (sr_LockObject)
-        //            {
-        //                if (s_Instance == null)
-        //                {
-        //                    s_Instance = new FacebookServiceFacade();
-        //                }
-        //            }
-        //        }
-
-        //        return s_Instance;
-        //    }
-        //}
+                return s_Instance;
+            }
+        }
 
         public void AttachObserver(IDataFetchedObserver i_DataFetchedObserver)
         {
@@ -99,27 +95,30 @@ namespace FacebookDPApp.Backend
                 throw new ArgumentException(nameof(i_LoggedInUser), "User cannot be null");
             }
 
-            try
+            lock (sr_InitLock)
             {
-                LoggedInUser = i_LoggedInUser;
-                UserName = LoggedInUser.Name ?? string.Empty;
-                UserProfilePicURL = LoggedInUser.PictureNormalURL;
+                try
+                {
+                    LoggedInUser = i_LoggedInUser;
+                    UserName = LoggedInUser.Name ?? string.Empty;
+                    // UserProfilePicURL = LoggedInUser.PictureNormalURL;
 
-                UserCoverPicURL = setCoverPhoto();
+                    UserCoverPicURL = setCoverPhoto();
 
-                setUserLocation();
-                setUserBirthdayAndAge();
-                setUserGender();
-                // setProfilePhoto();
-                setUserFriendsList();
-                loadUserData();
-                setUserPostsList();
-                setUserAlbumsList();
-                doWhenDataFetched();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Failed to initialize user data", ex);
+                    setUserLocation();
+                    setUserBirthdayAndAge();
+                    setUserGender();
+                    setProfilePhoto();
+                    setUserFriendsList();
+                    loadUserData();
+                    setUserPostsList();
+                    setUserAlbumsList();
+                    doWhenDataFetched();
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Failed to initialize user data", ex);
+                }
             }
         }
 
