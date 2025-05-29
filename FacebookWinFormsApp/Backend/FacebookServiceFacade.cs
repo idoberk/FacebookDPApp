@@ -34,7 +34,7 @@ namespace FacebookDPApp.Backend
 
         public int UserAge { get; private set; }
 
-        private readonly List<MyPost> r_PostsList = new List<MyPost>();
+        private readonly List<PostWrapper> r_PostsList = new List<PostWrapper>();
 
         private AlbumSlideShow m_AlbumSlideShowManager;
 
@@ -252,13 +252,13 @@ namespace FacebookDPApp.Backend
                 {
                     if (post.Message != null)
                     {
-                        r_PostsList.Add(new MyPost(post.Message, post.CreatedTime ?? DateTime.Now));
+                        r_PostsList.Add(new PostWrapper(post.Message, post.CreatedTime ?? DateTime.Now));
                     }
                 }
             }
         }
 
-        public List<MyPost> GetUserPosts()
+        public List<PostWrapper> GetUserPosts()
         {
             return r_PostsList;
         }
@@ -280,10 +280,10 @@ namespace FacebookDPApp.Backend
 
         public void AddPost(string i_PostText)
         {
-            r_PostsList.Insert(0, new MyPost(i_PostText, DateTime.Now));
+            r_PostsList.Insert(0, new PostWrapper(i_PostText, DateTime.Now));
         }
 
-        public void Sort(SortComponent<MyPost> i_Sorter)
+        public void Sort(SortComponent<PostWrapper> i_Sorter)
         {
             r_PostsList.Sort(i_Sorter);
         }

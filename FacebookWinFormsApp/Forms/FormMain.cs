@@ -19,7 +19,7 @@ namespace FacebookDPApp.Forms
         private readonly User r_LoggedInUser;
         private HigherLowerGameManager m_GameManager;
         private FacebookServiceFacade m_FacebookServiceFacade;
-        private SortingControl<MyPost> m_PostSortingControl;
+        private SortingControl<PostWrapper> m_PostSortingControl;
 
         public FormMain(User i_LoggedInUser)
         {
@@ -97,7 +97,7 @@ namespace FacebookDPApp.Forms
         private void initSortingControls()
         {
             m_PostSortingControl =
-                SortingControlFactory.CreatePostSortingControl(new Point(618, 54), new Size(210, 50));
+                SortingControlFactory.CreatePostSortingControl(new Point(618, 54), new Size(210, 50), "Sort posts by:");
 
             m_PostSortingControl.SortingChanged += PostSortingControl_SortingChanged;
 
@@ -159,7 +159,7 @@ namespace FacebookDPApp.Forms
             return form.ShowDialog() == DialogResult.OK ? textBox.Text : null;
         }
 
-        private void PostSortingControl_SortingChanged(object sender, SortComponent<MyPost> sorter)
+        private void PostSortingControl_SortingChanged(object sender, SortComponent<PostWrapper> sorter)
         {
             if (sorter != null)
             {
@@ -172,9 +172,9 @@ namespace FacebookDPApp.Forms
         {
             listBoxPosts.Invoke(new Action(() => listBoxPosts.Items.Clear()));
 
-            List<MyPost> postsList = m_FacebookServiceFacade.GetUserPosts();
+            List<PostWrapper> postsList = m_FacebookServiceFacade.GetUserPosts();
 
-            foreach (MyPost myPost in postsList)
+            foreach (PostWrapper myPost in postsList)
             {
                 if (myPost.Message != null)
                 {

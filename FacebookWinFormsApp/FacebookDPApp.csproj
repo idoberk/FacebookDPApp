@@ -126,7 +126,7 @@
     <Compile Include="Forms\FormMain.Designer.cs">
       <DependentUpon>FormMain.cs</DependentUpon>
     </Compile>
-    <Compile Include="Backend\MyPost.cs" />
+    <Compile Include="Backend\PostWrapper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Forms\FormLogin.resx">
