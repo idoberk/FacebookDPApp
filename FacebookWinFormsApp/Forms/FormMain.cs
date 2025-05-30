@@ -21,6 +21,8 @@ namespace FacebookDPApp.Forms
         private FacebookServiceFacade m_FacebookServiceFacade;
         private SortingControl<PostWrapper> m_PostSortingControl;
 
+        private ComboBox m_ComboBoxGameMode;
+
         public FormMain(User i_LoggedInUser)
         {
             InitializeComponent();
@@ -29,6 +31,7 @@ namespace FacebookDPApp.Forms
             textBoxFillStatus.LostFocus += textBoxFillStatus_LostFocus;
 
             initFacebookServiceFacade();
+            initializeGameModeSelector();
         }
 
         private void initFacebookServiceFacade()
@@ -102,6 +105,20 @@ namespace FacebookDPApp.Forms
             m_PostSortingControl.SortingChanged += PostSortingControl_SortingChanged;
 
             tabPageHome.Controls.Add(m_PostSortingControl);
+        }
+
+        private void initializeGameModeSelector()
+        {
+            m_ComboBoxGameMode = new ComboBox();
+            m_ComboBoxGameMode.Items.AddRange(new string[] {"Easy", "Normal", "Hard"});
+            m_ComboBoxGameMode.SelectedIndex = 0;
+            m_ComboBoxGameMode.Location = new Point(360, 26);
+            m_ComboBoxGameMode.Size = new Size(120, 25);
+            m_ComboBoxGameMode.DropDownStyle = ComboBoxStyle.DropDownList;
+            m_ComboBoxGameMode.Font = new Font("Microsoft Sans Serif", 10F, FontStyle.Bold);
+            m_ComboBoxGameMode.SelectedIndexChanged += comboBoxGameMode_SelectedIndexChanged;
+
+            panelMain.Controls.Add(m_ComboBoxGameMode);
         }
 
         private void setupContextMenu()
@@ -456,6 +473,24 @@ namespace FacebookDPApp.Forms
             buttonStopSlideshow.Visible = false;
             pictureBoxAlbums.Visible = false;
             listBoxAlbums.ClearSelected();
+        }
+
+        private void comboBoxGameMode_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(m_GameManager != null)
+            {
+                eGameMode selectedMode = (eGameMode)m_ComboBoxGameMode.SelectedIndex;
+
+                m_GameManager.SetGameMode(selectedMode);
+                m_GameManager.resetUiForNewGame();
+
+                // If a game is in progress, notify the user they need to start a new game
+                MessageBox.Show(
+                    "Game mode changed. Click 'New Game' to start with the new mode.",
+                    "Game Mode Changed",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
         }
     }
 }

@@ -79,8 +79,11 @@
   <ItemGroup>
     <Compile Include="Backend\AlbumSlideShow.cs" />
     <Compile Include="Backend\CompositeSorter.cs" />
+    <Compile Include="Backend\eGameMode.cs" />
     <Compile Include="Backend\FacebookServiceFacade.cs" />
+    <Compile Include="Backend\GameConfiguration.cs" />
     <Compile Include="Backend\GameOverEventArgs.cs" />
+    <Compile Include="Backend\GameTemplate.cs" />
     <Compile Include="Backend\GuessResultEventArgs.cs" />
     <Compile Include="Backend\HigherLowerGameLogic.cs" />
     <Compile Include="Backend\HigherLowerGameManager.cs" />

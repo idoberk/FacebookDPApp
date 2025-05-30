@@ -32,6 +32,8 @@ namespace FacebookDPApp.Backend
         private bool m_IsGameInit;
         private const int k_DelayBetweenRoundsMs = 3000;
 
+        private eGameMode m_GameMode = eGameMode.Easy;
+
         public HigherLowerGameManager(
             Label i_LabelScore,
             Label i_LabelTimer,
@@ -65,6 +67,11 @@ namespace FacebookDPApp.Backend
             m_IsGameInit = false;
         }
 
+        public void SetGameMode(eGameMode i_GameMode)
+        {
+            m_GameMode = i_GameMode;
+        }
+
         public void Initialize()
         {
             if (!m_IsGameInit)
@@ -85,7 +92,7 @@ namespace FacebookDPApp.Backend
             {
                 if (m_GameLogic == null)
                 {
-                    m_GameLogic = new HigherLowerGameLogic(r_LoggedInUser);
+                    m_GameLogic = new HigherLowerGameLogic(r_LoggedInUser, m_GameMode);
                 }
 
                 attachEventHandlers();
@@ -103,6 +110,9 @@ namespace FacebookDPApp.Backend
             if (m_GameLogic != null)
             {
                 Cleanup();
+
+                m_GameLogic = new HigherLowerGameLogic(r_LoggedInUser, m_GameMode);
+
                 initTimer();
                 attachEventHandlers();
                 attachButtonsEventHandlers();
@@ -176,11 +186,13 @@ namespace FacebookDPApp.Backend
             r_ButtonNewGame.Click += buttonNewGame_Click;
         }
 
-        private void resetUiForNewGame()
+        public void resetUiForNewGame()
         {
-            r_LabelScore.Text = "Score: 0";
+            GameConfiguration configuration = GameConfiguration.CreateGameConfiguration(m_GameMode);
 
-            r_LabelTimer.Text = $"Time: {m_GameLogic.TimeLimit}s";
+            r_LabelScore.Text = $"Score: 0 ({configuration.ModeName} Mode)";
+
+            r_LabelTimer.Text = $"Time: {configuration.InitialTimeSeconds}s";
             r_LabelTimer.ForeColor = Color.Blue;
 
             r_ButtonHigherPage1.Enabled = true;
@@ -191,9 +203,11 @@ namespace FacebookDPApp.Backend
 
         private void initStateUi()
         {
-            r_LabelScore.Text = "Score: 0";
+            GameConfiguration configuration = GameConfiguration.CreateGameConfiguration(m_GameMode);
 
-            r_LabelTimer.Text = $"Time: {m_GameLogic.TimeLimit}s";
+            r_LabelScore.Text = $"Score: 0 ({configuration.ModeName} Mode)";
+
+            r_LabelTimer.Text = $"Time: {configuration.InitialTimeSeconds}s";
             r_LabelTimer.ForeColor = Color.Blue;
 
             r_LabelPage1Name.Text = "Page Name";
