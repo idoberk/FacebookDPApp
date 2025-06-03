@@ -20,7 +20,7 @@ namespace FacebookDPApp.Forms
         {
             InitializeComponent();
             centerButton();
-            FacebookService.s_CollectionLimit = 5;
+            FacebookService.s_CollectionLimit = 6;
         }
 
         private void centerButton()

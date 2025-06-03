@@ -46,7 +46,7 @@ namespace FacebookDPApp.Backend
             m_WrongAnswersCount = 0;
         }
 
-        protected override void initializeGame()
+        protected override void InitializeGame()
         {
             r_UnusedPages.Clear();
             r_UsedPageIds.Clear();
@@ -58,24 +58,24 @@ namespace FacebookDPApp.Backend
             m_NewChallengingPage = getNextPage();
         }
 
-        protected override bool prepareRound()
+        protected override bool PrepareRound()
         {
             if(m_CurrentWinningPage == null || m_NewChallengingPage == null)
             {
                 return false;
             }
 
-            MockPage nextPage = getNextPage();
+            //MockPage nextPage = getNextPage();
 
-            if(nextPage == null && r_UnusedPages.Count == 0)
-            {
-                return false;
-            }
+            //if(nextPage == null && r_UnusedPages.Count == 0)
+            //{
+            //    return false;
+            //}
 
             return true;
         }
 
-        protected override void displayRound()
+        protected override void DisplayRound()
         {
             OnPagesSelected(
                 new PageSelectedEventArgs(
@@ -83,7 +83,7 @@ namespace FacebookDPApp.Backend
                     m_NewChallengingPage.GetOriginalPage()));
         }
 
-        protected override void startTimer()
+        protected override void StartTimer()
         {
             m_RemainingSeconds = TimeLimit;
             m_IsTimerRunning = true;
@@ -95,7 +95,7 @@ namespace FacebookDPApp.Backend
             m_IsTimerRunning = false;
         }
 
-        protected override GuessResultEventArgs evaluateGuess(bool i_UserGuess)
+        protected override GuessResultEventArgs EvaluateGuess(bool i_UserGuess)
         {
             bool isFirstPageHigher = m_CurrentWinningPage.LikesCount > m_NewChallengingPage.LikesCount;
             bool isCorrect = (i_UserGuess == isFirstPageHigher);
@@ -119,7 +119,7 @@ namespace FacebookDPApp.Backend
                 isFirstPageHigher);
         }
 
-        protected override void updateScore()
+        protected override void UpdateScore()
         {
             int pointsToAdd = r_GameConfiguration.PointsPerCorrectAnswer;
 
@@ -138,7 +138,7 @@ namespace FacebookDPApp.Backend
             }
         }
 
-        protected override void checkGameStatus()
+        protected override void CheckGameStatus()
         {
             bool hasReachedMaxWrongAnswers = r_GameConfiguration.MaxWrongAnswers > 0 &&
                                             m_WrongAnswersCount >= r_GameConfiguration.MaxWrongAnswers;
@@ -150,12 +150,12 @@ namespace FacebookDPApp.Backend
             }
         }
 
-        protected override bool getDefaultGuess()
+        protected override bool GetDefaultGuess()
         {
-            return true; // Default to "first page is higher"
+            return true;
         }
 
-        protected override void handleRoundError(Exception i_Exception)
+        protected override void HandleRoundError(Exception i_Exception)
         {
             throw new Exception("Error during game round: " + i_Exception.Message, i_Exception);
         }
@@ -285,197 +285,5 @@ namespace FacebookDPApp.Backend
                 throw new Exception("Not enough pages to start the game");
             }
         }
-
-        //public void StartNewGame()
-        //{
-        //    try
-        //    {
-        //        m_Score = 0;
-        //        m_IsGameOver = false;
-        //        m_RemainingSeconds = k_TimeLimitSeconds;
-        //        m_IsTimerRunning = false;
-
-        //        initPagesList();
-
-        //        m_CurrentWinningPage = getNextPage();
-        //        m_NewChallengingPage = getNextPage();
-
-        //        if (m_CurrentWinningPage != null && m_NewChallengingPage != null)
-        //        {
-        //            OnPagesSelected(
-        //                new PageSelectedEventArgs(
-        //                    m_CurrentWinningPage.GetOriginalPage(),
-        //                    m_NewChallengingPage.GetOriginalPage()));
-
-        //            startTimer();
-        //        }
-        //        else
-        //        {
-        //            throw new Exception("Not enough pages to start the game");
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception("Error starting the game: " + ex.Message);
-        //    }
-        //}
-
-        //private void startTimer()
-        //{
-        //    if (!m_IsGameOver)
-        //    {
-        //        m_RemainingSeconds = k_TimeLimitSeconds;
-        //        m_IsTimerRunning = true;
-        //        OnTimerTick();
-        //    }
-        //}
-
-        //public void StopTimer()
-        //{
-        //    m_IsTimerRunning = false;
-        //}
-
-        //public void TimerTicks()
-        //{
-        //    if (m_IsTimerRunning && !m_IsGameOver)
-        //    {
-        //        m_RemainingSeconds--;
-
-        //        if (m_RemainingSeconds <= 0)
-        //        {
-        //            m_RemainingSeconds = 0;
-        //            m_IsTimerRunning = false;
-        //            OnTimeExpired();
-        //        }
-        //        else
-        //        {
-        //            OnTimerTick();
-        //        }
-        //    }
-        //}
-
-        //private static void shufflePages<T>(List<T> i_List)
-        //{
-        //    int listCount = i_List.Count;
-
-        //    for (int i = listCount - 1; i > 0; i--)
-        //    {
-        //        int randomPageIndex = sr_RandomPage.Next(0, i + 1);
-
-        //        T temp = i_List[i];
-        //        i_List[i] = i_List[randomPageIndex];
-        //        i_List[randomPageIndex] = temp;
-        //    }
-        //}
-
-        //public void MakeGuess(bool i_IsFirstPageHigher)
-        //{
-        //    if (m_IsGameOver)
-        //    {
-        //        return;
-        //    }
-
-        //    StopTimer();
-
-        //    bool isFirstPageHigher = m_CurrentWinningPage.LikesCount > m_NewChallengingPage.LikesCount;
-        //    bool isCorrectGuess = (i_IsFirstPageHigher == isFirstPageHigher);
-
-        //    if (isCorrectGuess)
-        //    {
-        //        m_Score++;
-        //    }
-
-        //    OnGuessResult(
-        //        new GuessResultEventArgs(
-        //            (int)m_CurrentWinningPage.LikesCount,
-        //            (int)m_NewChallengingPage.LikesCount,
-        //            isCorrectGuess,
-        //            isFirstPageHigher));
-        //}
-
-        //public void SelectNextPage(bool i_KeepFirstPage)
-        //{
-        //    if (m_IsGameOver)
-        //    {
-        //        return;
-        //    }
-
-        //    selectNextPage(i_KeepFirstPage);
-        //}
-
-        //private void selectNextPage(bool i_KeepFirstPage)
-        //{
-        //    MockPage nextPage = getNextPage();
-
-        //    if (nextPage != null)
-        //    {
-        //        if (!i_KeepFirstPage)
-        //        {
-        //            m_CurrentWinningPage = m_NewChallengingPage;
-        //        }
-
-        //        m_NewChallengingPage = nextPage;
-        //        OnPagesSelected(
-        //            new PageSelectedEventArgs(
-        //                m_CurrentWinningPage.GetOriginalPage(),
-        //                m_NewChallengingPage.GetOriginalPage()));
-
-        //        startTimer();
-        //    }
-        //    else
-        //    {
-        //        m_IsGameOver = true;
-        //        OnGameOver(new GameOverEventArgs(m_Score));
-        //    }
-        //}
-
-        //private MockPage getNextPage()
-        //{
-        //    MockPage nextPage = null;
-
-        //    if (r_UnusedPages.Count > 0)
-        //    {
-        //        nextPage = r_UnusedPages[0];
-        //        r_UnusedPages.RemoveAt(0);
-        //        r_UsedPageIds.Add(nextPage.Id);
-        //    }
-
-        //    return nextPage;
-        //}
-
-        //public void HandleTimeExpired()
-        //{
-        //    if (!m_IsGameOver)
-        //    {
-        //        MakeGuess(i_IsFirstPageHigher: true);
-        //    }
-        //}
-
-        //protected virtual void OnTimerTick()
-        //{
-        //    bool isTimeRunningLow = m_RemainingSeconds <= k_LowTimeThreshold;
-
-        //    TimerTick?.Invoke(this, new TimerEventArgs(m_RemainingSeconds, isTimeRunningLow));
-        //}
-
-        //protected virtual void OnTimeExpired()
-        //{
-        //    TimeExpired?.Invoke(this, EventArgs.Empty);
-        //}
-
-        //protected virtual void OnPagesSelected(PageSelectedEventArgs e)
-        //{
-        //    PagesSelected?.Invoke(this, e);
-        //}
-
-        //protected virtual void OnGuessResult(GuessResultEventArgs e)
-        //{
-        //    GuessResult?.Invoke(this, e);
-        //}
-
-        //protected virtual void OnGameOver(GameOverEventArgs e)
-        //{
-        //    GameOver?.Invoke(this, e);
-        //}
     }
 }

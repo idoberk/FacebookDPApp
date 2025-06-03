@@ -246,6 +246,8 @@ namespace FacebookDPApp.Backend
 
         private void setUserPostsList()
         {
+            r_PostsList.Clear();
+
             if (LoggedInUser.Posts.Count != 0)
             {
                 foreach (Post post in LoggedInUser.Posts)

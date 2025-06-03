@@ -13,7 +13,6 @@ namespace FacebookDPApp.CustomControls
             control.Location = i_Location;
             control.Size = i_Size;
             control.LabelText = i_LabelText;
-            // control.LabelText = "Sort posts by:";
 
             control.AddSortOption(
                 "Alphabet (Ascending)",

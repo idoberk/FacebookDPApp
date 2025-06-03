@@ -117,6 +117,8 @@ namespace FacebookDPApp.Backend
                 attachEventHandlers();
                 attachButtonsEventHandlers();
                 resetUiForNewGame();
+                r_ButtonHigherPage1.Enabled = true;
+                r_ButtonHigherPage2.Enabled = true;
                 r_ButtonNewGame.Visible = false;
                 m_UiTimer.Start();
                 m_GameLogic.StartNewGame();
@@ -195,8 +197,8 @@ namespace FacebookDPApp.Backend
             r_LabelTimer.Text = $"Time: {configuration.InitialTimeSeconds}s";
             r_LabelTimer.ForeColor = Color.Blue;
 
-            r_ButtonHigherPage1.Enabled = true;
-            r_ButtonHigherPage2.Enabled = true;
+            // r_ButtonHigherPage1.Enabled = true;
+            // r_ButtonHigherPage2.Enabled = true;
 
             r_LabelRoundFeedback.Visible = false;
         }

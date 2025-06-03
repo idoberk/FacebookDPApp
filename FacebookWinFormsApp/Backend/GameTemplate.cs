@@ -25,7 +25,7 @@ namespace FacebookDPApp.Backend
             IsGameOver = false;
             m_IsRoundInProgress = false;
 
-            initializeGame();
+            InitializeGame();
             StartRound();
         }
 
@@ -37,10 +37,10 @@ namespace FacebookDPApp.Backend
 
                 try
                 {
-                    if (prepareRound())
+                    if (PrepareRound())
                     {
-                        displayRound();
-                        startTimer();
+                        DisplayRound();
+                        StartTimer();
                     }
                     else
                     {
@@ -50,7 +50,7 @@ namespace FacebookDPApp.Backend
                 }
                 catch (Exception ex)
                 {
-                    handleRoundError(ex);
+                    HandleRoundError(ex);
                     m_IsRoundInProgress = false;
                 }
             }
@@ -70,16 +70,16 @@ namespace FacebookDPApp.Backend
             {
                 stopTimer();
 
-                GuessResultEventArgs resultArgs = evaluateGuess(i_UserGuess);
+                GuessResultEventArgs resultArgs = EvaluateGuess(i_UserGuess);
 
                 if (resultArgs.IsCorrect)
                 {
-                    updateScore();
+                    UpdateScore();
                 }
 
                 OnGuessResult(resultArgs);
                 m_IsRoundInProgress = false;
-                checkGameStatus();
+                CheckGameStatus();
             }
         }
 
@@ -87,25 +87,25 @@ namespace FacebookDPApp.Backend
         {
             if (!IsGameOver && m_IsRoundInProgress)
             {
-                ProcessGuess(getDefaultGuess());
+                ProcessGuess(GetDefaultGuess());
             }
         }
 
-        protected abstract void initializeGame();
+        protected abstract void InitializeGame();
 
-        protected abstract bool prepareRound();
+        protected abstract bool PrepareRound();
 
-        protected abstract void displayRound();
-        protected abstract void startTimer();
+        protected abstract void DisplayRound();
+        protected abstract void StartTimer();
         protected abstract void stopTimer();
 
-        protected abstract GuessResultEventArgs evaluateGuess(bool i_UserGuess);
-        protected abstract void updateScore();
-        protected abstract void checkGameStatus();
+        protected abstract GuessResultEventArgs EvaluateGuess(bool i_UserGuess);
+        protected abstract void UpdateScore();
+        protected abstract void CheckGameStatus();
 
-        protected abstract bool getDefaultGuess();
+        protected abstract bool GetDefaultGuess();
 
-        protected abstract void handleRoundError(Exception i_Exception);
+        protected abstract void HandleRoundError(Exception i_Exception);
 
         protected virtual void OnGuessResult(GuessResultEventArgs i_EventArgs)
         {
