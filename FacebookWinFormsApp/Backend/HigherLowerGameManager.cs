@@ -23,6 +23,8 @@ namespace FacebookDPApp.Backend
         private readonly RoundedButton r_ButtonHigherPage2;
         private readonly RoundedButton r_ButtonNewGame;
 
+        private readonly ComboBox r_ComboBoxGameMode;
+
         private readonly Control r_ParentControl;
 
         private HigherLowerGameLogic m_GameLogic;
@@ -48,6 +50,7 @@ namespace FacebookDPApp.Backend
             RoundedButton i_ButtonHigherPage2,
             RoundedButton i_ButtonNewGame,
             Control i_ParentControl,
+            ComboBox i_ComboBoxGameMode,
             User i_LoggedInUser)
         {
             r_LabelScore = i_LabelScore;
@@ -63,6 +66,7 @@ namespace FacebookDPApp.Backend
             r_ButtonHigherPage2 = i_ButtonHigherPage2;
             r_ButtonNewGame = i_ButtonNewGame;
             r_ParentControl = i_ParentControl;
+            r_ComboBoxGameMode = i_ComboBoxGameMode;
             r_LoggedInUser = i_LoggedInUser;
             m_IsGameInit = false;
         }
@@ -120,6 +124,7 @@ namespace FacebookDPApp.Backend
                 r_ButtonHigherPage1.Enabled = true;
                 r_ButtonHigherPage2.Enabled = true;
                 r_ButtonNewGame.Visible = false;
+                r_ComboBoxGameMode.Visible = false;
                 m_UiTimer.Start();
                 m_GameLogic.StartNewGame();
             }
@@ -127,11 +132,12 @@ namespace FacebookDPApp.Backend
 
         public void Cleanup()
         {
-            m_GameLogic.StopTimer();
+            m_GameLogic.StopGameTimer();
             detachEventHandlers();
             stopAndDisposeTimers();
             detachButtonsEventHandlers();
             r_ButtonNewGame.Visible = true;
+            r_ComboBoxGameMode.Visible = true;
             m_IsGameInit = false;
         }
 
@@ -188,7 +194,7 @@ namespace FacebookDPApp.Backend
             r_ButtonNewGame.Click += buttonNewGame_Click;
         }
 
-        public void resetUiForNewGame()
+        private void resetUiForNewGame()
         {
             GameConfiguration configuration = GameConfiguration.CreateGameConfiguration(m_GameMode);
 
@@ -197,10 +203,12 @@ namespace FacebookDPApp.Backend
             r_LabelTimer.Text = $"Time: {configuration.InitialTimeSeconds}s";
             r_LabelTimer.ForeColor = Color.Blue;
 
-            // r_ButtonHigherPage1.Enabled = true;
-            // r_ButtonHigherPage2.Enabled = true;
-
             r_LabelRoundFeedback.Visible = false;
+        }
+
+        public void UpdateUIForNewGame()
+        {
+            resetUiForNewGame();
         }
 
         private void initStateUi()
@@ -415,6 +423,7 @@ namespace FacebookDPApp.Backend
             {
                 disableGuessButtons();
                 r_ButtonNewGame.Visible = true;
+                r_ComboBoxGameMode.Visible = true;
                 showGameOverMessage(i_GameOverData.FinalScore);
             }
             catch (Exception ex)

@@ -5,7 +5,9 @@ using FacebookWrapper.ObjectModel;
 namespace FacebookDPApp.Backend
 {
     public delegate void PagesSelectedEventHandler(object sender, PageSelectedEventArgs e);
+
     public delegate void TimerTickEventHandler(object sender, TimerEventArgs e);
+
     public delegate void TimeExpiredEventHandler(object sender, EventArgs e);
 
     public class HigherLowerGameLogic : GameTemplate
@@ -26,17 +28,20 @@ namespace FacebookDPApp.Backend
         private int m_WrongAnswersCount;
 
         public event PagesSelectedEventHandler PagesSelected;
+
         public event TimerTickEventHandler TimerTick;
+
         public event TimeExpiredEventHandler TimeExpired;
 
         public int TimeLimit { get; private set; }
 
-        public HigherLowerGameLogic(User i_LoggedInUser) : this(i_LoggedInUser, eGameMode.Easy)
+        public HigherLowerGameLogic(User i_LoggedInUser)
+            : this(i_LoggedInUser, eGameMode.Easy)
         {
-            
         }
 
-        public HigherLowerGameLogic(User i_LoggedInUser, eGameMode i_GameMode) : base()
+        public HigherLowerGameLogic(User i_LoggedInUser, eGameMode i_GameMode)
+            : base()
         {
             r_LoggedInUser = i_LoggedInUser;
             r_GameConfiguration = GameConfiguration.CreateGameConfiguration(i_GameMode);
@@ -60,19 +65,14 @@ namespace FacebookDPApp.Backend
 
         protected override bool PrepareRound()
         {
-            if(m_CurrentWinningPage == null || m_NewChallengingPage == null)
+            bool hasNextRound = true;
+
+            if (m_CurrentWinningPage == null || m_NewChallengingPage == null)
             {
-                return false;
+                hasNextRound = false;
             }
 
-            //MockPage nextPage = getNextPage();
-
-            //if(nextPage == null && r_UnusedPages.Count == 0)
-            //{
-            //    return false;
-            //}
-
-            return true;
+            return hasNextRound;
         }
 
         protected override void DisplayRound()
@@ -90,7 +90,7 @@ namespace FacebookDPApp.Backend
             OnTimerTick();
         }
 
-        protected override void stopTimer()
+        protected override void StopTimer()
         {
             m_IsTimerRunning = false;
         }
@@ -102,11 +102,11 @@ namespace FacebookDPApp.Backend
 
             m_LastGuessResult = isCorrect;
 
-            if(!isCorrect)
+            if (!isCorrect)
             {
                 m_WrongAnswersCount++;
 
-                if(r_GameConfiguration.ResetTimeOnWrongAnswer)
+                if (r_GameConfiguration.ResetTimeOnWrongAnswer)
                 {
                     TimeLimit = r_GameConfiguration.InitialTimeSeconds;
                 }
@@ -123,14 +123,14 @@ namespace FacebookDPApp.Backend
         {
             int pointsToAdd = r_GameConfiguration.PointsPerCorrectAnswer;
 
-            if(r_GameConfiguration.EnableTimeBonus)
+            if (r_GameConfiguration.EnableTimeBonus)
             {
                 pointsToAdd += m_RemainingSeconds * r_GameConfiguration.TimeBonusMultiplier;
             }
 
             Score += pointsToAdd;
 
-            if(r_GameConfiguration.DecreaseTimeEachRound)
+            if (r_GameConfiguration.DecreaseTimeEachRound)
             {
                 TimeLimit = Math.Max(
                     r_GameConfiguration.MinTimeSeconds,
@@ -140,10 +140,10 @@ namespace FacebookDPApp.Backend
 
         protected override void CheckGameStatus()
         {
-            bool hasReachedMaxWrongAnswers = r_GameConfiguration.MaxWrongAnswers > 0 &&
-                                            m_WrongAnswersCount >= r_GameConfiguration.MaxWrongAnswers;
+            bool hasReachedMaxWrongAnswers = r_GameConfiguration.MaxWrongAnswers > 0
+                                             && m_WrongAnswersCount >= r_GameConfiguration.MaxWrongAnswers;
 
-            if(hasReachedMaxWrongAnswers)
+            if (hasReachedMaxWrongAnswers)
             {
                 IsGameOver = true;
                 OnGameOver(new GameOverEventArgs(Score));
@@ -162,16 +162,17 @@ namespace FacebookDPApp.Backend
 
         public void TimerTicks()
         {
-            if(m_IsTimerRunning && !IsGameOver)
+            if (m_IsTimerRunning && !IsGameOver)
             {
                 m_RemainingSeconds--;
 
-                if(m_RemainingSeconds <= 0)
+                if (m_RemainingSeconds <= 0)
                 {
                     m_RemainingSeconds = 0;
                     m_IsTimerRunning = false;
                     OnTimeExpired();
-                } else
+                }
+                else
                 {
                     OnTimerTick();
                 }
@@ -185,20 +186,21 @@ namespace FacebookDPApp.Backend
 
         public void SelectNextPage(bool i_KeepFirstPage)
         {
-            if(!IsGameOver)
+            if (!IsGameOver)
             {
                 MockPage nextPage = getNextPage();
 
-                if(nextPage != null)
+                if (nextPage != null)
                 {
-                    if(!i_KeepFirstPage)
+                    if (!i_KeepFirstPage)
                     {
                         m_CurrentWinningPage = m_NewChallengingPage;
                     }
 
                     m_NewChallengingPage = nextPage;
                     ContinueToNextRound();
-                } else
+                }
+                else
                 {
                     IsGameOver = true;
                     OnGameOver(new GameOverEventArgs(Score));
@@ -206,9 +208,9 @@ namespace FacebookDPApp.Backend
             }
         }
 
-        public void StopTimer()
+        public void StopGameTimer()
         {
-            stopTimer();
+            StopTimer();
         }
 
         public void HandleTimeExpired()
@@ -220,7 +222,7 @@ namespace FacebookDPApp.Backend
         {
             int listCount = i_List.Count;
 
-            for(int i = listCount - 1; i > 0; i--)
+            for (int i = listCount - 1; i > 0; i--)
             {
                 int randomPageIndex = sr_RandomPage.Next(0, i + 1);
                 T temp = i_List[i];
@@ -233,7 +235,7 @@ namespace FacebookDPApp.Backend
         {
             MockPage nextPage = null;
 
-            if(r_UnusedPages.Count > 0)
+            if (r_UnusedPages.Count > 0)
             {
                 nextPage = r_UnusedPages[0];
                 r_UnusedPages.RemoveAt(0);

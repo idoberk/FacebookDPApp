@@ -92,15 +92,20 @@ namespace FacebookDPApp.Forms
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error updating UI after data fetch: {ex.Message}",
-                    "Update Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    $"Error updating UI after data fetch: {ex.Message}",
+                    "Update Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
             }
         }
 
         private void initSortingControls()
         {
-            m_PostSortingControl =
-                SortingControlFactory.CreatePostSortingControl(new Point(618, 54), new Size(210, 50), "Sort posts by:");
+            m_PostSortingControl = SortingControlFactory.CreatePostSortingControl(
+                new Point(618, 54),
+                new Size(210, 50),
+                "Sort posts by:");
 
             m_PostSortingControl.SortingChanged += PostSortingControl_SortingChanged;
 
@@ -110,7 +115,7 @@ namespace FacebookDPApp.Forms
         private void initializeGameModeSelector()
         {
             m_ComboBoxGameMode = new ComboBox();
-            m_ComboBoxGameMode.Items.AddRange(new string[] {"Easy", "Normal", "Hard"});
+            m_ComboBoxGameMode.Items.AddRange(new string[] { "Easy", "Normal", "Hard" });
             m_ComboBoxGameMode.SelectedIndex = 0;
             m_ComboBoxGameMode.Location = new Point(360, 26);
             m_ComboBoxGameMode.Size = new Size(120, 25);
@@ -145,25 +150,29 @@ namespace FacebookDPApp.Forms
             }
         }
 
-        private string showInputDialog(string i_Title, string i_TextPrompt, string i_PrevAlbumName)
+        private static string showInputDialog(string i_Title, string i_TextPrompt, string i_PrevAlbumName)
         {
             Form form = new Form();
+
             form.ShowIcon = false;
             form.Text = i_Title;
             form.Size = new Size(300, 150);
             form.StartPosition = FormStartPosition.CenterParent;
 
             Label label = new Label();
+
             label.Text = i_TextPrompt;
             label.Location = new Point(10, 10);
             label.AutoSize = true;
 
             TextBox textBox = new TextBox();
+
             textBox.Location = new Point(10, 40);
             textBox.Size = new Size(200, 20);
             textBox.Text = i_PrevAlbumName;
 
             Button okButton = new Button();
+
             okButton.DialogResult = DialogResult.OK;
             okButton.Text = "Ok";
             okButton.Location = new Point(120, 80);
@@ -205,8 +214,7 @@ namespace FacebookDPApp.Forms
 
         private void buttonLogout_Click(object sender, EventArgs e)
         {
-            FacebookService.Logout();
-            // FacebookService.LogoutWithUI();
+            FacebookService.LogoutWithUI();
             this.Invoke(new Action(this.Close));
         }
 
@@ -287,6 +295,7 @@ namespace FacebookDPApp.Forms
                         buttonHigherPage2,
                         buttonNewGame,
                         this,
+                        m_ComboBoxGameMode,
                         r_LoggedInUser);
                 }
 
@@ -320,13 +329,6 @@ namespace FacebookDPApp.Forms
                     updateFriendsListAsync();
                     updatePostsListAsync();
                     updateAlbumsListAsync();
-
-                    //new Thread(getProfilePhoto) {IsBackground = true }.Start();
-                    //new Thread(getCoverPhoto) { IsBackground = true }.Start();
-                    //new Thread(getUserInfo) { IsBackground = true }.Start();
-                    //new Thread(fetchFriends) { IsBackground = true }.Start();
-                    //new Thread(fetchPosts) { IsBackground = true }.Start();
-                    //new Thread(fetchAlbums) { IsBackground = true }.Start();
                 }
             }
             catch (Exception ex)
@@ -348,7 +350,7 @@ namespace FacebookDPApp.Forms
         private void updateUserInfoListAsync()
         {
             listBoxUserInfo.Items.Clear();
-            foreach(string userInfo in m_FacebookServiceFacade.UserInfo)
+            foreach (string userInfo in m_FacebookServiceFacade.UserInfo)
             {
                 listBoxUserInfo.Items.Add(userInfo);
             }
@@ -360,12 +362,13 @@ namespace FacebookDPApp.Forms
 
             FacebookObjectCollection<User> friendsList = m_FacebookServiceFacade.GetUserFriendsList();
 
-            if(friendsList.Count == 0)
+            if (friendsList.Count == 0)
             {
                 listBoxFriendsList.Items.Add("No friends found!");
-            } else
+            }
+            else
             {
-                foreach(User friend in friendsList)
+                foreach (User friend in friendsList)
                 {
                     listBoxFriendsList.Items.Add(friend.Name);
                 }
@@ -374,10 +377,11 @@ namespace FacebookDPApp.Forms
 
         private void updatePostsListAsync()
         {
-            if(m_FacebookServiceFacade.GetUserPosts().Count == 0)
+            if (m_FacebookServiceFacade.GetUserPosts().Count == 0)
             {
                 MessageBox.Show("No Posts to load");
-            } else
+            }
+            else
             {
                 updatePostList();
             }
@@ -477,19 +481,12 @@ namespace FacebookDPApp.Forms
 
         private void comboBoxGameMode_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if(m_GameManager != null)
+            if (m_GameManager != null)
             {
                 eGameMode selectedMode = (eGameMode)m_ComboBoxGameMode.SelectedIndex;
 
                 m_GameManager.SetGameMode(selectedMode);
-                m_GameManager.resetUiForNewGame();
-
-                // If a game is in progress, notify the user they need to start a new game
-                MessageBox.Show(
-                    "Game mode changed. Click 'New Game' to start with the new mode.",
-                    "Game Mode Changed",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
+                m_GameManager.UpdateUIForNewGame();
             }
         }
     }

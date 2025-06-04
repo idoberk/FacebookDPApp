@@ -3,15 +3,25 @@
     public class GameConfiguration
     {
         public int InitialTimeSeconds { get; private set; }
+
         public int MinTimeSeconds { get; private set; }
+
         public int TimeDecreaseAmount { get; private set; }
+
         public int PointsPerCorrectAnswer { get; private set; }
+
         public int TimeBonusMultiplier { get; private set; }
+
         public int MaxWrongAnswers { get; private set; }
+
         public int LowTimeThreshold { get; private set; }
+
         public bool DecreaseTimeEachRound { get; private set; }
+
         public bool EnableTimeBonus { get; private set; }
+
         public bool ResetTimeOnWrongAnswer { get; private set; }
+
         public string ModeName { get; private set; }
 
         public static GameConfiguration CreateGameConfiguration(eGameMode i_GameMode)

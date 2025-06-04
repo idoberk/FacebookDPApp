@@ -94,7 +94,6 @@
     <Compile Include="Backend\PropertySorter.cs" />
     <Compile Include="Backend\SortComponent.cs" />
     <Compile Include="Backend\TimerEventArgs.cs" />
-    <Compile Include="Backend\UserDataManager.cs" />
     <Compile Include="CustomControls\CircularPictureBox.cs">
       <SubType>Component</SubType>
     </Compile>

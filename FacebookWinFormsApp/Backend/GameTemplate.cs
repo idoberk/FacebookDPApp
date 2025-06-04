@@ -5,7 +5,9 @@ namespace FacebookDPApp.Backend
     public abstract class GameTemplate
     {
         protected bool m_IsRoundInProgress;
+
         public int Score { get; protected set; }
+
         public bool IsGameOver { get; protected set; }
 
         public event EventHandler<GameOverEventArgs> GameOver;
@@ -68,7 +70,7 @@ namespace FacebookDPApp.Backend
         {
             if (!IsGameOver && m_IsRoundInProgress)
             {
-                stopTimer();
+                StopTimer();
 
                 GuessResultEventArgs resultArgs = EvaluateGuess(i_UserGuess);
 
@@ -96,23 +98,27 @@ namespace FacebookDPApp.Backend
         protected abstract bool PrepareRound();
 
         protected abstract void DisplayRound();
+
         protected abstract void StartTimer();
-        protected abstract void stopTimer();
+
+        protected abstract void StopTimer();
 
         protected abstract GuessResultEventArgs EvaluateGuess(bool i_UserGuess);
+
         protected abstract void UpdateScore();
+
         protected abstract void CheckGameStatus();
 
         protected abstract bool GetDefaultGuess();
 
         protected abstract void HandleRoundError(Exception i_Exception);
 
-        protected virtual void OnGuessResult(GuessResultEventArgs i_EventArgs)
+        protected void OnGuessResult(GuessResultEventArgs i_EventArgs)
         {
             GuessResult?.Invoke(this, i_EventArgs);
         }
 
-        protected virtual void OnGameOver(GameOverEventArgs i_EventArgs)
+        protected void OnGameOver(GameOverEventArgs i_EventArgs)
         {
             GameOver?.Invoke(this, i_EventArgs);
         }
